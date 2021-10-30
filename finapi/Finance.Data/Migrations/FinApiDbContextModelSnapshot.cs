@@ -41,7 +41,7 @@ namespace Finance.Data.Migrations
                     b.Property<string>("Identifier")
                         .HasColumnType("varchar(255)");
 
-                    b.HasKey("UserId", "Provider", "Identifier");
+                    b.HasKey("Provider", "Identifier");
 
                     b.ToTable("UserLogins");
                 });

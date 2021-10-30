@@ -20,7 +20,6 @@ namespace Finance.Data
         {
             builder.Entity<UserLogin>().HasKey(x => new
             {
-                x.UserId,
                 x.Provider,
                 x.Identifier
             });
