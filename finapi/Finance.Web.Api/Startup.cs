@@ -1,9 +1,11 @@
+using Finance.Data;
 using Finance.Web.Api.Configuration.Implementation;
 using Finance.Web.Api.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -43,6 +45,9 @@ namespace Finance.Web.Api
                         IssuerSigningKey = jwtOptions.SecurityKey
                     };
                 });
+
+            DatabaseConfiguration dbConfig = Configuration.GetDatabaseConfiguration("FinaApiDb");
+            services.AddDbContext<FinApiDbContext>(x => x.UseMySql(dbConfig.ConnectionString, new MySqlServerVersion(dbConfig.ServerVersion)));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
