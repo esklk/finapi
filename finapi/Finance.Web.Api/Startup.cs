@@ -1,3 +1,6 @@
+using Finance.Business.Mapping;
+using Finance.Business.Services;
+using Finance.Business.Services.Implementation;
 using Finance.Data;
 using Finance.Web.Api.Configuration.Implementation;
 using Finance.Web.Api.Extensions;
@@ -30,24 +33,30 @@ namespace Finance.Web.Api
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            JwtOptions jwtOptions = Configuration.GetJwtOptions();
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(x =>
-                {
-                    x.RequireHttpsMetadata = true;
-                    x.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateLifetime = true,
-                        ValidateIssuer = true,
-                        ValidateAudience = false,
-                        ValidIssuer = jwtOptions.Issuer,
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = jwtOptions.SecurityKey
-                    };
-                });
+            //JwtOptions jwtOptions = Configuration.GetJwtOptions();
+            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            //    .AddJwtBearer(x =>
+            //    {
+            //        x.RequireHttpsMetadata = true;
+            //        x.TokenValidationParameters = new TokenValidationParameters
+            //        {
+            //            ValidateLifetime = true,
+            //            ValidateIssuer = true,
+            //            ValidateAudience = false,
+            //            ValidIssuer = jwtOptions.Issuer,
+            //            ValidateIssuerSigningKey = true,
+            //            IssuerSigningKey = jwtOptions.SecurityKey
+            //        };
+            //    });
 
             DatabaseConfiguration dbConfig = Configuration.GetDatabaseConfiguration("FinaApiDb");
             services.AddDbContext<FinApiDbContext>(x => x.UseMySql(dbConfig.ConnectionString, new MySqlServerVersion(dbConfig.ServerVersion)));
+
+            services.AddAutoMapper(typeof(DefaultMappingProfile));
+
+            services.AddScoped<IUserService, UserService>();
+
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -58,15 +67,22 @@ namespace Finance.Web.Api
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseRouting();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapGet("/", async context =>
+            app.UseHttpsRedirection()
+                .UseRouting()
+                .UseEndpoints(endpoints =>
                 {
-                    await context.Response.WriteAsync("Hello World!");
+                    endpoints.MapControllers();
                 });
-            });
+                //.UseAuthentication()
+                //.UseAuthorization();
+
+            //app.UseEndpoints(endpoints =>
+            //{
+            //    endpoints.MapGet("/", async context =>
+            //    {
+            //        await context.Response.WriteAsync("Hello World!");
+            //    });
+            //});
         }
     }
 }
