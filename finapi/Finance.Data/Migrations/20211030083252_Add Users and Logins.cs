@@ -37,7 +37,7 @@ namespace Finance.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserLogins", x => new { x.UserId, x.Provider, x.Identifier });
+                    table.PrimaryKey("PK_UserLogins", x => new { x.Provider, x.Identifier });
                     table.ForeignKey(
                         name: "FK_UserLogins_Users_UserId",
                         column: x => x.UserId,

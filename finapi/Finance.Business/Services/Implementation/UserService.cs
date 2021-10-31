@@ -2,7 +2,10 @@
 using Finance.Business.Models;
 using Finance.Data;
 using Finance.Data.Models;
+using Microsoft.EntityFrameworkCore;
+using MySqlConnector;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Finance.Business.Services.Implementation
@@ -29,19 +32,13 @@ namespace Finance.Business.Services.Implementation
                 throw new ArgumentException("The value must not be null, empty or whitespace string.", nameof(loginIdentifier));
             }
 
-            var login = await GetUserLogin(loginProvider, loginIdentifier);
+            var query = _context.UserLogins.Where(x => x.Provider == loginProvider && x.Identifier == loginIdentifier).Select(x => x.User);
 
-            return _mapper.Map<UserModel>(login?.User);
+            return await _mapper.ProjectTo<UserModel>(query).SingleOrDefaultAsync();
         }
 
         public async Task<UserModel> CreateUserAsync(string name, string loginProvider, string loginIdentifier)
         {
-            var login = await GetUserLogin(loginProvider, loginIdentifier);
-            if (login != null)
-            {
-                throw new InvalidOperationException("Login with given Provider and Identifier already exists.");
-            }
-
             var userToSave = new User
             {
                 Name = name,
@@ -56,14 +53,18 @@ namespace Finance.Business.Services.Implementation
             };
 
             _context.Users.Add(userToSave);
-            await _context.SaveChangesAsync();
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch(DbUpdateException ex) 
+            when (ex?.InnerException is MySqlException mySqlEx && mySqlEx.ErrorCode == MySqlErrorCode.DuplicateKeyEntry)
+            {
+                throw new InvalidOperationException("Login with given Provider and Identifier already exists.", ex);
+            }
 
             return _mapper.Map<UserModel>(userToSave);
-        }
-
-        private async Task<UserLogin> GetUserLogin(string loginProvider, string loginIdentifier)
-        {
-            return await _context.UserLogins.FindAsync(loginProvider, loginIdentifier);
         }
     }
 }
