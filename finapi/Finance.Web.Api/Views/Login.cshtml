@@ -1,0 +1,73 @@
+﻿@model Finance.Web.Api.Models.LoginModel
+@{
+    Layout = null;
+}
+<script>
+    var extractAccessToken = function() {
+        if (!window.location.hash) {
+            throw "No hash.";
+        }
+
+        let hashParams = new URLSearchParams(window.location.hash.substr(1));
+        let access_token = hashParams.get("access_token");
+        if (!access_token) {
+            throw "No access token.";
+        }
+
+        let state = hashParams.get("state");
+        if (!state) {
+            throw "No state.";
+        }
+        if (![@Html.Raw(string.Join(", ", Model.Select(x => $"\"{x.State}\"")))].some(x => x === state)) {
+            throw "Onvalid state."
+        }
+
+        return access_token;
+    }
+</script>
+@if (!string.IsNullOrWhiteSpace(Model.RedirectUrl))
+{
+<script>
+    (function() {
+        if (!window.location.hash)
+        {
+            return;
+        }
+
+        let url = new URL("@Html.Raw(Model.RedirectUrl)");
+
+        let hashParams = new URLSearchParams(window.location.hash.substr(1));
+        hashParams.set("access_token", extractAccessToken());
+
+        url.hash = "#" + hashParams.toString();
+        window.location = url;
+    })();
+</script>
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Login</title>
+</head>
+<body>
+    <div class="wrapper">
+        @foreach (var loginOption in Model)
+        {
+            <a class="btnlogin @loginOption.Provider" href="@loginOption.Url">@loginOption.Provider</a>
+        }
+    </div>
+</body>
+</html>
+<script>
+    (function () {
+        if (!window.location.hash) {
+            return;
+        }
+
+        let accessTokenElement = document.createElement("span");
+        accessTokenElement.textContent = extractAccessToken();
+        document.getElementsByClassName("wrapper")[0].append(accessTokenElement);
+    })()
+</script>

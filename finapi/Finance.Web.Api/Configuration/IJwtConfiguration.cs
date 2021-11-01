@@ -2,7 +2,7 @@
 
 namespace Finance.Web.Api.Configuration
 {
-    public interface IJwtOptions
+    public interface IJwtConfiguration
     {
         string Issuer { get; }
 

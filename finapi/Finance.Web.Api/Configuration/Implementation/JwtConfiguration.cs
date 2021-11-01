@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Finance.Web.Api.Configuration.Implementation
 {
-    public class JwtOptions : IJwtOptions
+    public class JwtConfiguration : IJwtConfiguration
     {
         public string Issuer { get; set; }
 

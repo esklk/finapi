@@ -2,21 +2,21 @@ using Finance.Business.Mapping;
 using Finance.Business.Services;
 using Finance.Business.Services.Implementation;
 using Finance.Data;
+using Finance.Web.Api.Configuration;
 using Finance.Web.Api.Configuration.Implementation;
+using Finance.Web.Api.Controllers;
 using Finance.Web.Api.Extensions;
+using Finance.Web.Api.Services;
+using Finance.Web.Api.Services.Implementation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Finance.Web.Api
 {
@@ -33,21 +33,21 @@ namespace Finance.Web.Api
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            //JwtOptions jwtOptions = Configuration.GetJwtOptions();
-            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            //    .AddJwtBearer(x =>
-            //    {
-            //        x.RequireHttpsMetadata = true;
-            //        x.TokenValidationParameters = new TokenValidationParameters
-            //        {
-            //            ValidateLifetime = true,
-            //            ValidateIssuer = true,
-            //            ValidateAudience = false,
-            //            ValidIssuer = jwtOptions.Issuer,
-            //            ValidateIssuerSigningKey = true,
-            //            IssuerSigningKey = jwtOptions.SecurityKey
-            //        };
-            //    });
+            JwtConfiguration jwtOptions = Configuration.GetJwtOptions();
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(x =>
+                {
+                    x.RequireHttpsMetadata = true;
+                    x.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateLifetime = true,
+                        ValidateIssuer = true,
+                        ValidateAudience = false,
+                        ValidIssuer = jwtOptions.Issuer,
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = jwtOptions.SecurityKey
+                    };
+                });
 
             DatabaseConfiguration dbConfig = Configuration.GetDatabaseConfiguration("FinaApiDb");
             services.AddDbContext<FinApiDbContext>(x => x.UseMySql(dbConfig.ConnectionString, new MySqlServerVersion(dbConfig.ServerVersion)));
@@ -56,7 +56,13 @@ namespace Finance.Web.Api
 
             services.AddScoped<IUserService, UserService>();
 
+            IDictionary<string, OAuthConfiguration> oauthConfigs = Configuration.GetConfigurationDictionary<OAuthConfiguration>(ConfigurationConstants.OAuthConfiguration);
+            services.AddSingleton<IEnumerable<KeyValuePair<string, OAuthConfiguration>>>(oauthConfigs);
+
+            services.AddScoped<ILoginService, LoginService>();
+            
             services.AddControllers();
+            services.AddControllersWithViews();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -75,14 +81,6 @@ namespace Finance.Web.Api
                 });
                 //.UseAuthentication()
                 //.UseAuthorization();
-
-            //app.UseEndpoints(endpoints =>
-            //{
-            //    endpoints.MapGet("/", async context =>
-            //    {
-            //        await context.Response.WriteAsync("Hello World!");
-            //    });
-            //});
         }
     }
 }
