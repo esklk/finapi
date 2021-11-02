@@ -8,7 +8,7 @@ namespace Finance.Web.Api.Extensions
 {
     public static class ConfigurationExtensions
     {
-        public static JwtConfiguration GetJwtOptions(this IConfiguration configuration) => configuration
+        public static JwtConfiguration GetJwtConfiguration(this IConfiguration configuration) => configuration
             .GetSection(ConfigurationConstants.JwtConfiguration)
             .Get<JwtConfiguration>();
 
@@ -18,7 +18,7 @@ namespace Finance.Web.Api.Extensions
             ? dbConfig 
             : throw new KeyNotFoundException($"Can not find \"{name}\" database configuration.");
 
-        public static IDictionary<string, T> GetConfigurationDictionary<T>(this IConfiguration configuration, string name) => configuration
+        public static Dictionary<string, T> GetConfigurationDictionary<T>(this IConfiguration configuration, string name) => configuration
             .GetSection(name)
             .GetChildren()
             .ToDictionary(k => k.Key, e => e.Get<T>());

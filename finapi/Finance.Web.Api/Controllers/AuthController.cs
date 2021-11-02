@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Finance.Business.Services;
+using Finance.Web.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Finance.Web.Api.Controllers
@@ -11,17 +9,18 @@ namespace Finance.Web.Api.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly IAuthenticationService _authenticationService;
 
-        public AuthController(IUserService userService)
+        public AuthController(IAuthenticationService authenticationService)
         {
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _authenticationService = authenticationService ?? throw new ArgumentNullException(nameof(authenticationService));
         }
 
         [HttpGet]
-        public async Task<object> Get()
+        public async Task<object> Get(string provider, string token)
         {
-            return "Hello world!";
+            
+            return await _authenticationService.AuthenticateAsync(token, provider);
         }
     }
 }

@@ -4,10 +4,11 @@ using Finance.Business.Services.Implementation;
 using Finance.Data;
 using Finance.Web.Api.Configuration;
 using Finance.Web.Api.Configuration.Implementation;
-using Finance.Web.Api.Controllers;
 using Finance.Web.Api.Extensions;
 using Finance.Web.Api.Services;
 using Finance.Web.Api.Services.Implementation;
+using Finance.Web.Api.Services.Tokens.PayloadMapping;
+using Finance.Web.Api.Services.Tokens.PayloadMapping.Implementation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -17,6 +18,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Finance.Web.Api
 {
@@ -33,7 +35,7 @@ namespace Finance.Web.Api
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            JwtConfiguration jwtOptions = Configuration.GetJwtOptions();
+            JwtConfiguration jwtConfig = Configuration.GetJwtConfiguration();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(x =>
                 {
@@ -43,11 +45,12 @@ namespace Finance.Web.Api
                         ValidateLifetime = true,
                         ValidateIssuer = true,
                         ValidateAudience = false,
-                        ValidIssuer = jwtOptions.Issuer,
+                        ValidIssuer = jwtConfig.Issuer,
                         ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = jwtOptions.SecurityKey
+                        IssuerSigningKey = jwtConfig.SecurityKey
                     };
                 });
+            services.AddSingleton<IJwtConfiguration>(jwtConfig);
 
             DatabaseConfiguration dbConfig = Configuration.GetDatabaseConfiguration("FinaApiDb");
             services.AddDbContext<FinApiDbContext>(x => x.UseMySql(dbConfig.ConnectionString, new MySqlServerVersion(dbConfig.ServerVersion)));
@@ -56,10 +59,20 @@ namespace Finance.Web.Api
 
             services.AddScoped<IUserService, UserService>();
 
-            IDictionary<string, OAuthConfiguration> oauthConfigs = Configuration.GetConfigurationDictionary<OAuthConfiguration>(ConfigurationConstants.OAuthConfiguration);
+            Dictionary<string, OAuthConfiguration> oauthConfigs = Configuration.GetConfigurationDictionary<OAuthConfiguration>(ConfigurationConstants.OAuthConfiguration);
             services.AddSingleton<IEnumerable<KeyValuePair<string, OAuthConfiguration>>>(oauthConfigs);
 
-            services.AddScoped<ILoginService, LoginService>();
+            services.AddHttpClient();
+
+            services
+                .AddSingleton<GoogleAccessTokenConfiguration>()
+                .AddSingleton<GoogleAccessTokenValidator>()
+                .AddScoped<IAccessTokenGenerator, JwtAccessTokenGenerator>()
+                .AddScoped<IAuthenticationService, AuthenticationService>()
+                .AddScoped<ILoginService, LoginService>()
+                .AddSingleton<IPayloadMapperFactory, AccessTokenPayloadMapperFactory>()
+                .AddSingleton<ITokenValidatorFactory, OAuthTokenValidatorFactory>()
+                .AddScoped<SecurityTokenHandler, JwtSecurityTokenHandler>();
             
             services.AddControllers();
             services.AddControllersWithViews();
