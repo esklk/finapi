@@ -30,15 +30,17 @@ namespace Finance.Web.Api.Services.Implementation
             var message = new HttpRequestMessage(HttpMethod.Get, string.Format(UrlTemplate, token));
             
             HttpResponseMessage response = await _clientFactory.CreateClient().SendAsync(message);
+            
+            Stream content = await response.Content.ReadAsStreamAsync();
+            var data = await JsonSerializer.DeserializeAsync<Dictionary<string, object>>(content);
             if (!response.IsSuccessStatusCode)
             {
-                return new TokenValidationResult(response.ReasonPhrase);
+                return new TokenValidationResult(data.TryGetValue("error_description", out var error) 
+                    ? error.ToString() 
+                    : response.ReasonPhrase);
             }
-
-            Stream content = await response.Content.ReadAsStreamAsync();
-            var payload = await JsonSerializer.DeserializeAsync<Dictionary<string, object>>(content);
-
-            return new TokenValidationResult(payload.ToDictionary(x => x.Key, x => x.Value.ToString(), StringComparer.OrdinalIgnoreCase));
+            
+            return new TokenValidationResult(data.ToDictionary(x => x.Key, x => x.Value.ToString(), StringComparer.OrdinalIgnoreCase));
         }
     }
 }
