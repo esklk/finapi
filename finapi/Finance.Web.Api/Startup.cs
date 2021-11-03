@@ -57,7 +57,9 @@ namespace Finance.Web.Api
 
             services.AddAutoMapper(typeof(DefaultMappingProfile));
 
-            services.AddScoped<IUserService, UserService>();
+            services
+                .AddScoped<IUserService, UserService>()
+                .AddScoped<IAccountService, AccountService>();
 
             Dictionary<string, OAuthConfiguration> oauthConfigs = Configuration.GetConfigurationDictionary<OAuthConfiguration>(ConfigurationConstants.OAuthConfiguration);
             services.AddSingleton<IEnumerable<KeyValuePair<string, OAuthConfiguration>>>(oauthConfigs);

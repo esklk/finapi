@@ -9,6 +9,7 @@ namespace Finance.Business.Mapping
         public DefaultMappingProfile()
         {
             CreateMap<User, UserModel>();
+            CreateMap<Account, AccountModel>();
         }
     }
 }

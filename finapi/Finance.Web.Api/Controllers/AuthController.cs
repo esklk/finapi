@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Finance.Web.Api.Models;
 using Finance.Web.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Finance.Web.Api.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
-    public class AuthController : ControllerBase
+    public class AuthController : ApiControllerBase
     {
         private readonly IAuthenticationService _authenticationService;
 
@@ -17,7 +17,7 @@ namespace Finance.Web.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<object> Get(string provider, string token)
+        public async Task<AuthModel> Get(string provider, string token)
         {   
             return await _authenticationService.AuthenticateAsync(token, provider);
         }
