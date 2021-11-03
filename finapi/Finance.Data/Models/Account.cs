@@ -2,14 +2,12 @@
 
 namespace Finance.Data.Models
 {
-    public class User
+    public class Account
     {
         public int Id { get; set; }
 
         public string Name { get; set; }
 
-        public ICollection<UserLogin> UserLogins { get; set; }
-
-        public ICollection<Account> Accounts { get; set; }
+        public ICollection<User> Users { get; set; }
     }
 }

@@ -12,6 +12,8 @@ namespace Finance.Data
     {
         public FinApiDbContext(DbContextOptions<FinApiDbContext> options) : base(options) { }
 
+        public DbSet<Account> Accounts { get; set; }
+
         public DbSet<User> Users { get; set; }
 
         public DbSet<UserLogin> UserLogins { get; set; }

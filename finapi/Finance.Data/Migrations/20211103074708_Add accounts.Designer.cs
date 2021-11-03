@@ -2,14 +2,16 @@
 using Finance.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Finance.Data.Migrations
 {
     [DbContext(typeof(FinApiDbContext))]
-    partial class FinApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211103074708_Add accounts")]
+    partial class Addaccounts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
