@@ -18,8 +18,7 @@ namespace Finance.Web.Api.Controllers
 
         [HttpGet]
         public async Task<object> Get(string provider, string token)
-        {
-            
+        {   
             return await _authenticationService.AuthenticateAsync(token, provider);
         }
     }
