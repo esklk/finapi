@@ -2,6 +2,9 @@ using Finance.Business.Mapping;
 using Finance.Business.Services;
 using Finance.Business.Services.Implementation;
 using Finance.Data;
+using Finance.Web.Api.Authorization;
+using Finance.Web.Api.Authorization.Handlers;
+using Finance.Web.Api.Authorization.Requirements;
 using Finance.Web.Api.Configuration;
 using Finance.Web.Api.Configuration.Implementation;
 using Finance.Web.Api.Extensions;
@@ -10,6 +13,7 @@ using Finance.Web.Api.Services.Implementation;
 using Finance.Web.Api.Services.Tokens.PayloadMapping;
 using Finance.Web.Api.Services.Tokens.PayloadMapping.Implementation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -50,6 +54,10 @@ namespace Finance.Web.Api
                         IssuerSigningKey = jwtConfig.SecurityKey
                     };
                 });
+
+            services.AddAuthorization(x => x.AddPolicy(Policies.AccountOwner, y => y.Requirements.Add(new AccountOwnerRequirement())));
+            services.AddSingleton<IAuthorizationHandler, AccountAuthorizationHandler>();
+
             services.AddSingleton<IJwtConfiguration>(jwtConfig);
 
             DatabaseConfiguration dbConfig = Configuration.GetDatabaseConfiguration("FinaApiDb");

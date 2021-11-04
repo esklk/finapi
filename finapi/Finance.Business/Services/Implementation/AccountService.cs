@@ -2,7 +2,9 @@
 using Finance.Business.Models;
 using Finance.Data;
 using Finance.Data.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Finance.Business.Services.Implementation
@@ -31,6 +33,22 @@ namespace Finance.Business.Services.Implementation
             await _context.SaveChangesAsync();
 
             return _mapper.Map<AccountModel>(account);
+        }
+
+        public async Task DeleteAccountAsync(int id)
+        {
+            _context.Remove(new Account { Id = id });
+
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> IsAccountOwnedByUser(int accountId, int userId)
+        {
+            return await _context.Accounts
+                .Where(x => x.Id == accountId)
+                .SelectMany(x => x.Users)
+                .AnyAsync(x => x.Id == userId);
         }
     }
 }

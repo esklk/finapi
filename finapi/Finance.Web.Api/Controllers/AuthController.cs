@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Finance.Web.Api.Controllers
 {
     [Route("api/[controller]")]
-    public class AuthController : ApiControllerBase
+    public class AuthController : ControllerBase
     {
         private readonly IAuthenticationService _authenticationService;
 
