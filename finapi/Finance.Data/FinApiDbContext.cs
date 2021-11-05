@@ -1,10 +1,5 @@
 ﻿using Finance.Data.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Finance.Data
 {
@@ -13,6 +8,10 @@ namespace Finance.Data
         public FinApiDbContext(DbContextOptions<FinApiDbContext> options) : base(options) { }
 
         public DbSet<Account> Accounts { get; set; }
+
+        public DbSet<OperationCategory> OperationCategories { get; set; }
+
+        public DbSet<Operation> Operations { get; set; }
 
         public DbSet<User> Users { get; set; }
 
