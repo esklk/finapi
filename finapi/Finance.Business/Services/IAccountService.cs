@@ -7,6 +7,8 @@ namespace Finance.Business.Services
     {
         Task<AccountModel> CreateAccountAsync(string name, int userId);
 
+        Task<AccountModel[]> GetAccountsAsync(int userId);
+
         Task DeleteAccountAsync(int id);
 
         Task<bool> IsAccountOwnedByUser(int accountId, int userId);

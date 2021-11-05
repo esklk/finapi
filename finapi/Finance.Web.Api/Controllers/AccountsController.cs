@@ -20,10 +20,16 @@ namespace Finance.Web.Api.Controllers
             _accountService = accountService ?? throw new System.ArgumentNullException(nameof(accountService));
         }
 
-        [HttpPost]
-        public async Task<AccountModel> Create(CreateAccountModel data)
+        [HttpGet]
+        public async Task<AccountModel[]> Get()
         {
-            return await _accountService.CreateAccountAsync(data.Name, User.GetUserId().Value);
+            return await _accountService.GetAccountsAsync(User.GetUserId());
+        }
+
+        [HttpPost]
+        public async Task<AccountModel> Create([FromBody]AccountDataModel data)
+        {
+            return await _accountService.CreateAccountAsync(data.Name, User.GetUserId());
         }
 
         [Route("{accountId}")]

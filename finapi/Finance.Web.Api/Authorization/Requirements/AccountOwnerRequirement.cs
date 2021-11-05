@@ -16,13 +16,9 @@ namespace Finance.Web.Api.Authorization.Requirements
                 return false;
             }
 
-            int? userId = context.User.GetUserId();
-            if (!userId.HasValue)
-            {
-                return false;
-            }
+            int userId = context.User.GetUserId();
 
-            return await context.RequestServices.GetRequiredService<IAccountService>().IsAccountOwnedByUser(accountId, userId.Value);
+            return await context.RequestServices.GetRequiredService<IAccountService>().IsAccountOwnedByUser(accountId, userId);
         }
     }
 }

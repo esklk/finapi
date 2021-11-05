@@ -20,6 +20,13 @@ namespace Finance.Business.Services.Implementation
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
+        public async Task<AccountModel[]> GetAccountsAsync(int userId)
+        {
+            IQueryable<Account> query = _context.Accounts.Where(a => a.Users.Any(u => u.Id == userId));
+
+            return await _mapper.ProjectTo<AccountModel>(query).ToArrayAsync();
+        }
+
         public async Task<AccountModel> CreateAccountAsync(string name, int userId)
         {
             User user = await _context.Users.FindAsync(userId);
