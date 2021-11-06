@@ -46,7 +46,6 @@ namespace Finance.Business.Services.Implementation
         {
             _context.Remove(new Account { Id = id });
 
-
             await _context.SaveChangesAsync();
         }
 
