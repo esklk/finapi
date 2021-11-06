@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Finance.Data.Models
 {
@@ -10,10 +11,11 @@ namespace Finance.Data.Models
 
         public string Name { get; set; }
 
-        public ICollection<Account> Accounts { get; set; }
+        public int AccountId { get; set; }
+
+        [ForeignKey(nameof(AccountId))]
+        public Account Account { get; set; }
 
         public ICollection<Operation> Operations { get; set; }
-        
-        public ICollection<User> Users { get; set; }
     }
 }
