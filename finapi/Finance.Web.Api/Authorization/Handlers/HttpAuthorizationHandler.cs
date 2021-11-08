@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Finance.Web.Api.Authorization.Handlers
 {
-    public class AccountAuthorizationHandler : AuthorizationHandler<IHttpAuthorizationRequirement, HttpContext>
+    public class HttpAuthorizationHandler : AuthorizationHandler<IHttpAuthorizationRequirement, HttpContext>
     {
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, IHttpAuthorizationRequirement requirement, HttpContext resource)
         {

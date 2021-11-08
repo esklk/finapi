@@ -8,6 +8,7 @@ using Finance.Web.Api.Authorization.Requirements;
 using Finance.Web.Api.Configuration;
 using Finance.Web.Api.Configuration.Implementation;
 using Finance.Web.Api.Extensions;
+using Finance.Web.Api.Filters;
 using Finance.Web.Api.Services;
 using Finance.Web.Api.Services.Implementation;
 using Finance.Web.Api.Services.Tokens.PayloadMapping;
@@ -56,7 +57,7 @@ namespace Finance.Web.Api
                 });
 
             services.AddAuthorization(x => x.AddPolicy(Policies.AccountOwner, y => y.Requirements.Add(new AccountOwnerRequirement())));
-            services.AddSingleton<IAuthorizationHandler, AccountAuthorizationHandler>();
+            services.AddSingleton<IAuthorizationHandler, HttpAuthorizationHandler>();
 
             services.AddSingleton<IJwtConfiguration>(jwtConfig);
 
@@ -87,8 +88,8 @@ namespace Finance.Web.Api
                 .AddSingleton<IPayloadMapperFactory, AccessTokenPayloadMapperFactory>()
                 .AddSingleton<ITokenValidatorFactory, OAuthTokenValidatorFactory>()
                 .AddScoped<SecurityTokenHandler, JwtSecurityTokenHandler>();
-            
-            services.AddControllers();
+
+            services.AddControllers(options => options.Filters.Add(typeof(ModelValidationActionFilter)));
             services.AddControllersWithViews();
         }
 
