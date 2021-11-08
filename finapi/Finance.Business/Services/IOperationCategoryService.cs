@@ -5,8 +5,9 @@ namespace Finance.Business.Services
 {
     public interface IOperationCategoryService
     {
-        Task<OperationCategoryModel> CreateCategory(string name, bool isIncome, int accountId);
+        Task<OperationCategoryModel> CreateCategoryAsync(string name, bool isIncome, int accountId);
         Task DeleteCategoryAsync(int id);
-        Task<OperationCategoryModel[]> GetCategories(int accountId);
+        Task<OperationCategoryModel[]> GetCategoriesAsync(int accountId);
+        Task<bool> IsCategoryBelongedToAccountAsync(int categoryId, int accountId);
     }
 }

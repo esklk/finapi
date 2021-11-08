@@ -1,7 +1,7 @@
 ﻿using Finance.Business.Models;
 using Finance.Business.Services;
 using Finance.Web.Api.Authorization;
-using Finance.Web.Api.Extensions;
+using Finance.Web.Api.Filters;
 using Finance.Web.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,16 +23,17 @@ namespace Finance.Web.Api.Controllers
         [HttpGet]
         public async Task<OperationCategoryModel[]> Get(int accountId)
         {
-            return await _operationCategoryService.GetCategories(accountId);
+            return await _operationCategoryService.GetCategoriesAsync(accountId);
         }
 
         [HttpPost]
         public async Task<OperationCategoryModel> Create(int accountId, [FromBody]OperationCategoryDataModel data)
         {
-            return await _operationCategoryService.CreateCategory(data.Name, data.IsIncome, accountId);
+            return await _operationCategoryService.CreateCategoryAsync(data.Name, data.IsIncome, accountId);
         }
 
         [Route("{operationCategoryId}")]
+        [NestedResourceFilter(ParentResourceIdentifier = "accountId", NestedResourceIdentifier = "operationCategoryId")]
         [HttpDelete]
         public async Task Delete(int operationCategoryId)
         {

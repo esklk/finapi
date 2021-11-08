@@ -21,14 +21,14 @@ namespace Finance.Business.Services.Implementation
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<OperationCategoryModel[]> GetCategories(int accountId)
+        public async Task<OperationCategoryModel[]> GetCategoriesAsync(int accountId)
         {
             IQueryable<OperationCategory> query = _context.OperationCategories.Where(x => x.AccountId == accountId);
 
             return await _mapper.ProjectTo<OperationCategoryModel>(query).ToArrayAsync();
         }
 
-        public async Task<OperationCategoryModel> CreateCategory(string name, bool isIncome, int accountId)
+        public async Task<OperationCategoryModel> CreateCategoryAsync(string name, bool isIncome, int accountId)
         {
             var category = new OperationCategory
             {
@@ -53,9 +53,22 @@ namespace Finance.Business.Services.Implementation
 
         public async Task DeleteCategoryAsync(int categoryId)
         {
-            _context.Remove(new OperationCategory { Id = categoryId });
+            OperationCategory category = await _context.OperationCategories.FindAsync(categoryId);
+            if(category == null)
+            {
+                throw new ArgumentException("Operation Category with given Id does not exist.", nameof(categoryId));
+            }
+
+            _context.Remove(category);
 
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> IsCategoryBelongedToAccountAsync(int categoryId, int accountId)
+        {
+            OperationCategory category = await _context.OperationCategories.FindAsync(categoryId);
+
+            return category?.AccountId == accountId;
         }
     }
 }

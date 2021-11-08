@@ -66,9 +66,9 @@ namespace Finance.Web.Api
             services.AddAutoMapper(typeof(DefaultMappingProfile));
 
             services
-                .AddScoped<IUserService, UserService>()
                 .AddScoped<IAccountService, AccountService>()
-                .AddScoped<IOperationCategoryService, OperationCategoryService>();
+                .AddScoped<IOperationCategoryService, OperationCategoryService>()
+                .AddScoped<IUserService, UserService>();
 
             Dictionary<string, OAuthConfiguration> oauthConfigs = Configuration.GetConfigurationDictionary<OAuthConfiguration>(ConfigurationConstants.OAuthConfiguration);
             services.AddSingleton<IEnumerable<KeyValuePair<string, OAuthConfiguration>>>(oauthConfigs);
@@ -81,6 +81,8 @@ namespace Finance.Web.Api
                 .AddScoped<IAccessTokenGenerator, JwtAccessTokenGenerator>()
                 .AddScoped<IAuthenticationService, AuthenticationService>()
                 .AddScoped<ILoginService, LoginService>()
+                .AddScoped<INestingCheckerFactory, NestingCheckerFactory>()
+                .AddScoped<OperationCategoryNestingChecker>()
                 .AddSingleton<IPayloadMapperFactory, AccessTokenPayloadMapperFactory>()
                 .AddSingleton<ITokenValidatorFactory, OAuthTokenValidatorFactory>()
                 .AddScoped<SecurityTokenHandler, JwtSecurityTokenHandler>();
