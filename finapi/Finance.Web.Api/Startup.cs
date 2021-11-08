@@ -68,6 +68,7 @@ namespace Finance.Web.Api
             services
                 .AddScoped<IAccountService, AccountService>()
                 .AddScoped<IOperationCategoryService, OperationCategoryService>()
+                .AddScoped<IOperationService, OperationService>()
                 .AddScoped<IUserService, UserService>();
 
             Dictionary<string, OAuthConfiguration> oauthConfigs = Configuration.GetConfigurationDictionary<OAuthConfiguration>(ConfigurationConstants.OAuthConfiguration);
