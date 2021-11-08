@@ -19,6 +19,9 @@ namespace Finance.Data.Models
         [ForeignKey(nameof(AuthorId))]
         public User Author { get; set; }
 
+        public int CategoryId { get; set; }
+
+        [ForeignKey(nameof(CategoryId))]
         public OperationCategory Category { get; set; }
 
         public DateTime CreatedOn { get; set; }
