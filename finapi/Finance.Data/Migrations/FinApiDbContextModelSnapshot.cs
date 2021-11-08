@@ -52,19 +52,24 @@ namespace Finance.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<int>("AccountId")
+                        .HasColumnType("int");
+
                     b.Property<double>("Ammount")
                         .HasColumnType("double");
 
                     b.Property<int>("AuthorId")
                         .HasColumnType("int");
 
-                    b.Property<int>("CategoryId")
+                    b.Property<int?>("CategoryId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
 
                     b.HasIndex("AuthorId");
 
@@ -144,6 +149,12 @@ namespace Finance.Data.Migrations
 
             modelBuilder.Entity("Finance.Data.Models.Operation", b =>
                 {
+                    b.HasOne("Finance.Data.Models.Account", "Account")
+                        .WithMany("Operations")
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Finance.Data.Models.User", "Author")
                         .WithMany("Operations")
                         .HasForeignKey("AuthorId")
@@ -152,9 +163,9 @@ namespace Finance.Data.Migrations
 
                     b.HasOne("Finance.Data.Models.OperationCategory", "Category")
                         .WithMany("Operations")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CategoryId");
+
+                    b.Navigation("Account");
 
                     b.Navigation("Author");
 
@@ -186,6 +197,8 @@ namespace Finance.Data.Migrations
             modelBuilder.Entity("Finance.Data.Models.Account", b =>
                 {
                     b.Navigation("OperationCategories");
+
+                    b.Navigation("Operations");
                 });
 
             modelBuilder.Entity("Finance.Data.Models.OperationCategory", b =>

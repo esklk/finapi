@@ -7,6 +7,11 @@ namespace Finance.Data.Models
     {
         public int Id { get; set; }
 
+        public int AccountId { get; set; }
+
+        [ForeignKey(nameof(AccountId))]
+        public Account Account { get; set; }
+
         public double Ammount { get; set; }
 
         public int AuthorId { get; set; }
@@ -14,9 +19,6 @@ namespace Finance.Data.Models
         [ForeignKey(nameof(AuthorId))]
         public User Author { get; set; }
 
-        public int CategoryId { get; set; }
-
-        [ForeignKey(nameof(CategoryId))]
         public OperationCategory Category { get; set; }
 
         public DateTime CreatedOn { get; set; }
