@@ -12,6 +12,7 @@ namespace Finance.Business.Mapping
             CreateMap<User, UserModel>();
             CreateMap<Account, AccountModel>();
             CreateMap<OperationCategory, OperationCategoryModel>();
+            CreateMap<Operation, OperationModel>();
         }
     }
 }
