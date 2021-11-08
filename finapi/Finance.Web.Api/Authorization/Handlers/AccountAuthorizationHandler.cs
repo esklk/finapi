@@ -9,7 +9,7 @@ namespace Finance.Web.Api.Authorization.Handlers
     {
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, IHttpAuthorizationRequirement requirement, HttpContext resource)
         {
-            if (await requirement.FulfillAsync(resource))
+            if (context.User.Identity.IsAuthenticated && await requirement.FulfillAsync(resource))
             {
                 context.Succeed(requirement);
                 return;
