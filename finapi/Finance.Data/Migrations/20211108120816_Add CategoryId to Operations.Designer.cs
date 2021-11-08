@@ -3,14 +3,16 @@ using System;
 using Finance.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Finance.Data.Migrations
 {
     [DbContext(typeof(FinApiDbContext))]
-    partial class FinApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211108120816_Add CategoryId to Operations")]
+    partial class AddCategoryIdtoOperations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

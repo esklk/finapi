@@ -3,14 +3,16 @@ using System;
 using Finance.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Finance.Data.Migrations
 {
     [DbContext(typeof(FinApiDbContext))]
-    partial class FinApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211108120619_Remove AccountId from Operation")]
+    partial class RemoveAccountIdfromOperation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -58,7 +60,7 @@ namespace Finance.Data.Migrations
                     b.Property<int>("AuthorId")
                         .HasColumnType("int");
 
-                    b.Property<int>("CategoryId")
+                    b.Property<int?>("CategoryId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedOn")
@@ -152,9 +154,7 @@ namespace Finance.Data.Migrations
 
                     b.HasOne("Finance.Data.Models.OperationCategory", "Category")
                         .WithMany("Operations")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CategoryId");
 
                     b.Navigation("Author");
 

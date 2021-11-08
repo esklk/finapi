@@ -10,8 +10,6 @@ namespace Finance.Data.Models
 
         public ICollection<OperationCategory> OperationCategories { get; set; }
 
-        public ICollection<Operation> Operations { get; set; }
-
         public ICollection<User> Users { get; set; }
     }
 }
