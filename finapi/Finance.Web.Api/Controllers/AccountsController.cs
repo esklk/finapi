@@ -27,9 +27,11 @@ namespace Finance.Web.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<AccountModel> Create([FromBody]AccountDataModel data)
+        public async Task<ActionResult<AccountModel>> Create([FromBody]AccountDataModel data)
         {
-            return await _accountService.CreateAccountAsync(data.Name, User.GetUserId());
+            AccountModel result = await _accountService.CreateAccountAsync(data.Name, User.GetUserId());
+
+            return CreatedAtAction(nameof(Create), result);
         }
 
         [Route("{accountId}")]

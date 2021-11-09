@@ -30,9 +30,12 @@ namespace Finance.Web.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<OperationModel> Create(int accountId, [FromBody]OperationDataModel data)
+        public async Task<ActionResult<OperationModel>> Create(int accountId, [FromBody]OperationDataModel data)
         {
-            return await _operationService.CreateOperation(User.GetUserId(), accountId, data.CategoryId, data.Ammount, data.CreatedAt);
+            OperationModel result = await _operationService
+                .CreateOperation(User.GetUserId(), accountId, data.CategoryId, data.Ammount, data.CreatedAt);
+
+            return CreatedAtAction(nameof(Create), result);
         }
     }
 }

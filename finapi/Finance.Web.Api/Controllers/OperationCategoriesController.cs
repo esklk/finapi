@@ -27,9 +27,11 @@ namespace Finance.Web.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<OperationCategoryModel> Create(int accountId, [FromBody]OperationCategoryDataModel data)
+        public async Task<ActionResult<OperationCategoryModel>> Create(int accountId, [FromBody]OperationCategoryDataModel data)
         {
-            return await _operationCategoryService.CreateCategoryAsync(data.Name, data.IsIncome, accountId);
+            OperationCategoryModel result = await _operationCategoryService.CreateCategoryAsync(data.Name, data.IsIncome, accountId);
+
+            return CreatedAtAction(nameof(Create), result);
         }
 
         [Route("{operationCategoryId}")]
