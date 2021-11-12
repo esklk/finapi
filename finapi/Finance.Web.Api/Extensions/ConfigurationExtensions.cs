@@ -2,12 +2,21 @@
 using Finance.Web.Api.Configuration.Implementation;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 
 namespace Finance.Web.Api.Extensions
 {
     public static class ConfigurationExtensions
     {
+        public static string BuildConnectionString(this DatabaseConfiguration configuration) => new SqlConnectionStringBuilder
+        {
+            DataSource = $"{configuration.Server},{configuration.Port}",
+            InitialCatalog = configuration.Database,
+            Password = configuration.Password,
+            UserID = configuration.UserId,
+        }.ConnectionString;
+
         public static JwtConfiguration GetJwtConfiguration(this IConfiguration configuration) => configuration
             .GetSection(ConfigurationConstants.JwtConfiguration)
             .Get<JwtConfiguration>();

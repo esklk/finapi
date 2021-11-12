@@ -62,7 +62,7 @@ namespace Finance.Web.Api
             services.AddSingleton<IJwtConfiguration>(jwtConfig);
 
             DatabaseConfiguration dbConfig = Configuration.GetDatabaseConfiguration("FinaApiDb");
-            services.AddDbContext<FinApiDbContext>(x => x.UseMySql(dbConfig.ConnectionString, new MySqlServerVersion(dbConfig.ServerVersion)));
+            services.AddDbContext<FinApiDbContext>(x => x.UseMySql(dbConfig.BuildConnectionString(), new MySqlServerVersion(dbConfig.ServerVersion)));
 
             services.AddAutoMapper(typeof(DefaultMappingProfile));
 
