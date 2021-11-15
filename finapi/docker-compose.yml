@@ -5,9 +5,9 @@ services:
     image: mysql:5.7
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: 1
-      MYSQL_DATABASE: finapidb
-      MYSQL_USER: fnp_user
-      MYSQL_PASSWORD: "#He110W0rld$$"
+      MYSQL_DATABASE: ${FINAPI_DatabaseConfiguration__FinaApiDb__Database}
+      MYSQL_USER: ${FINAPI_DatabaseConfiguration__FinaApiDb__UserId}
+      MYSQL_PASSWORD: ${FINAPI_DatabaseConfiguration__FinaApiDb__Password}
     ports:
       - 3306:3306
     volumes:
