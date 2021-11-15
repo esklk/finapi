@@ -1,5 +1,5 @@
 {
-  "projects": [ "src", "test" ],
+  "projects": [ "Finance.Web.Api" ],
   "sdk": {
     "version": "5.0"
   }
