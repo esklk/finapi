@@ -352,4 +352,4 @@ MigrationBackup/
 # Custom
 appsettings.*.json
 /finapi/dbdata
-/finapi/setup_environment.ps1
+/finapi/setup_environment_*.ps1
