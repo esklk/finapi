@@ -3,8 +3,6 @@ using Finance.Business.Exceptions;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Finance.Web.Api.Services.Tokens.PayloadMapping.Implementation
 {

@@ -73,7 +73,7 @@ namespace Finance.Web.Api
                 .AddScoped<IUserService, UserService>();
 
             Dictionary<string, OAuthConfiguration> oauthConfigs = Configuration.GetConfigurationDictionary<OAuthConfiguration>(ConfigurationConstants.OAuthConfiguration);
-            services.AddSingleton<IEnumerable<KeyValuePair<string, OAuthConfiguration>>>(oauthConfigs);
+            services.AddSingleton<IDictionary<string, OAuthConfiguration>>(oauthConfigs);
 
             services.AddHttpClient();
 
@@ -82,11 +82,14 @@ namespace Finance.Web.Api
                 .AddSingleton<GoogleAccessTokenValidator>()
                 .AddScoped<IAccessTokenGenerator, JwtAccessTokenGenerator>()
                 .AddScoped<IAuthenticationService, AuthenticationService>()
+                .AddSingleton<IJwtTokenManager, JwtTokenManager>()
                 .AddScoped<ILoginService, LoginService>()
                 .AddScoped<INestingCheckerFactory, NestingCheckerFactory>()
-                .AddScoped<OperationCategoryNestingChecker>()
+                .AddSingleton<IOauthConfigurationProvider, OauthConfigurationProvider>()
                 .AddSingleton<IPayloadMapperFactory, AccessTokenPayloadMapperFactory>()
                 .AddSingleton<ITokenValidatorFactory, OAuthTokenValidatorFactory>()
+                .AddSingleton<IUriManager, UriManager>()
+                .AddScoped<OperationCategoryNestingChecker>()
                 .AddScoped<SecurityTokenHandler, JwtSecurityTokenHandler>();
 
             services.AddControllers(options => options.Filters.Add(typeof(ModelValidationActionFilter)));
