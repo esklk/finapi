@@ -63,12 +63,5 @@ namespace Finance.Business.Services.Implementation
 
             await _context.SaveChangesAsync();
         }
-
-        public async Task<bool> IsCategoryBelongedToAccountAsync(int categoryId, int accountId)
-        {
-            OperationCategory category = await _context.OperationCategories.FindAsync(categoryId);
-
-            return category?.AccountId == accountId;
-        }
     }
 }
