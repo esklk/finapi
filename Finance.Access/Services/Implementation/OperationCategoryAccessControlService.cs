@@ -39,6 +39,7 @@ namespace Finance.Access.Services.Implementation
             if (accessData.Accounts.Any(x => x.OperationCategoriesIds.Contains(id)))
             {
                 await operationCategoryService.DeleteCategoryAsync(id);
+                return;
             }
 
             throw new ResourceAccessViolationException();

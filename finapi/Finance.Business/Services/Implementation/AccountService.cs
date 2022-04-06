@@ -48,13 +48,5 @@ namespace Finance.Business.Services.Implementation
 
             await _context.SaveChangesAsync();
         }
-
-        public async Task<bool> IsAccountOwnedByUser(int accountId, int userId)
-        {
-            return await _context.Accounts
-                .Where(x => x.Id == accountId)
-                .SelectMany(x => x.Users)
-                .AnyAsync(x => x.Id == userId);
-        }
     }
 }

@@ -10,7 +10,5 @@ namespace Finance.Business.Services
         Task<AccountModel[]> GetAccountsAsync(int userId);
 
         Task DeleteAccountAsync(int id);
-
-        Task<bool> IsAccountOwnedByUser(int accountId, int userId);
     }
 }
