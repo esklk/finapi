@@ -1,7 +1,5 @@
 ﻿using Finance.Business.Models;
 using Finance.Business.Services;
-using Finance.Web.Api.Authorization;
-using Finance.Web.Api.Filters;
 using Finance.Web.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +8,7 @@ using System.Threading.Tasks;
 namespace Finance.Web.Api.Controllers
 {
     [Route("api/accounts/{accountId:int}/[controller]")]
-    [Authorize(Policies.AccountOwner)]
+    [Authorize]
     public class OperationCategoriesController : ControllerBase
     {
         private readonly IOperationCategoryService _operationCategoryService;
@@ -35,7 +33,6 @@ namespace Finance.Web.Api.Controllers
         }
 
         [Route("{operationCategoryId}")]
-        [NestedResourceFilter(ParentResourceIdentifier = "accountId", NestedResourceIdentifier = "operationCategoryId")]
         [HttpDelete]
         public async Task Delete(int operationCategoryId)
         {

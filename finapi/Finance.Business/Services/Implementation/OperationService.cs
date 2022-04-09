@@ -52,11 +52,18 @@ namespace Finance.Business.Services.Implementation
 
         }
 
-        public IQueryable<OperationModel> QueryOperations(int accountId)
+        public async Task<T[]> QueryOperations<T>(int accountId, Func<IQueryable<OperationModel>, IQueryable<T>> queryAction)
         {
+            if(queryAction == null)
+            {
+                throw new ArgumentNullException(nameof(queryAction));
+            }
+
             var query = _context.Operations.Where(x => x.AccountId == accountId);
 
-            return _mapper.ProjectTo<OperationModel>(query);
+            var resultQuery = queryAction(_mapper.ProjectTo<OperationModel>(query));
+
+            return await resultQuery.ToArrayAsync();
         }
     }
 }

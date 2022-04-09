@@ -2,9 +2,7 @@ using Finance.Business.Mapping;
 using Finance.Business.Services;
 using Finance.Business.Services.Implementation;
 using Finance.Data;
-using Finance.Web.Api.Authorization;
 using Finance.Web.Api.Authorization.Handlers;
-using Finance.Web.Api.Authorization.Requirements;
 using Finance.Web.Api.Configuration;
 using Finance.Web.Api.Configuration.Implementation;
 using Finance.Web.Api.Extensions;
@@ -56,7 +54,7 @@ namespace Finance.Web.Api
                     };
                 });
 
-            services.AddAuthorization(x => x.AddPolicy(Policies.AccountOwner, y => y.Requirements.Add(new AccountOwnerRequirement())));
+            services.AddAuthorization();
             services.AddSingleton<IAuthorizationHandler, HttpAuthorizationHandler>();
 
             services.AddSingleton<IJwtConfiguration>(jwtConfig);
@@ -84,12 +82,10 @@ namespace Finance.Web.Api
                 .AddScoped<IAuthenticationService, AuthenticationService>()
                 .AddSingleton<IJwtTokenManager, JwtTokenManager>()
                 .AddScoped<ILoginService, LoginService>()
-                .AddScoped<INestingCheckerFactory, NestingCheckerFactory>()
                 .AddSingleton<IOauthConfigurationProvider, OauthConfigurationProvider>()
                 .AddSingleton<IPayloadMapperFactory, AccessTokenPayloadMapperFactory>()
                 .AddSingleton<ITokenValidatorFactory, OAuthTokenValidatorFactory>()
                 .AddSingleton<IUriManager, UriManager>()
-                .AddScoped<OperationCategoryNestingChecker>()
                 .AddScoped<SecurityTokenHandler, JwtSecurityTokenHandler>();
 
             services.AddControllers(options => options.Filters.Add(typeof(ModelValidationActionFilter)));

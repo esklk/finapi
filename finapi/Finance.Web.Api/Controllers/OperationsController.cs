@@ -1,11 +1,11 @@
 ﻿using Finance.Business.Models;
 using Finance.Business.Services;
-using Finance.Web.Api.Authorization;
 using Finance.Web.Api.Extensions;
 using Finance.Web.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Query.Wrapper;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Finance.Web.Api.Controllers
 {
     [Route("api/accounts/{accountId:int}/[controller]")]
-    [Authorize(Policies.AccountOwner)]
+    [Authorize]
     public class OperationsController : ControllerBase
     {
         private readonly IOperationService _operationService;
@@ -24,9 +24,17 @@ namespace Finance.Web.Api.Controllers
         }
 
         [HttpGet]
-        public IQueryable Get(int accountId, ODataQueryOptions<OperationModel> query)
+        public async Task<dynamic[]> Get(int accountId, ODataQueryOptions<OperationModel> query)
         {
-            return query.ApplyTo(_operationService.QueryOperations(accountId));
+            //TODO: move this to some service to keep controller thin
+            var result = await _operationService.QueryOperations(accountId, x => query.ApplyTo(x) as IQueryable<dynamic>);
+
+            if (query.SelectExpand != null)
+            {
+                result = result.Cast<ISelectExpandWrapper>().Select(x => x.ToDictionary()).ToArray();
+            }
+
+            return result;
         }
 
         [HttpPost]

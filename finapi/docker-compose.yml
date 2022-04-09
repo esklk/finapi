@@ -1,4 +1,4 @@
-version: '3.4'
+version: "3.4"
 
 services:
   mysql.db:
@@ -19,14 +19,14 @@ services:
       context: .
       dockerfile: Finance.Web.Api/Dockerfile
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
-      - ASPNETCORE_HTTPS_PORT=44349
-      - FINAPI_DatabaseConfiguration__FinaApiDb__Database
-      - FINAPI_DatabaseConfiguration__FinaApiDb__Password
-      - FINAPI_DatabaseConfiguration__FinaApiDb__Port
-      - FINAPI_DatabaseConfiguration__FinaApiDb__Server=mysql.db
-      - FINAPI_DatabaseConfiguration__FinaApiDb__UserId
+      - "ASPNETCORE_ENVIRONMENT=Development"
+      - "ASPNETCORE_URLS=https://+:443;http://+:80"
+      - "ASPNETCORE_HTTPS_PORT=44349"
+      - "FINAPI_DatabaseConfiguration__FinaApiDb__Database=${FINAPI_DatabaseConfiguration__FinaApiDb__Database}"
+      - "FINAPI_DatabaseConfiguration__FinaApiDb__Password=${FINAPI_DatabaseConfiguration__FinaApiDb__Password}"
+      - "FINAPI_DatabaseConfiguration__FinaApiDb__Port=${FINAPI_DatabaseConfiguration__FinaApiDb__Port}"
+      - "FINAPI_DatabaseConfiguration__FinaApiDb__Server=${FINAPI_DatabaseConfiguration__FinaApiDb__Server}"
+      - "FINAPI_DatabaseConfiguration__FinaApiDb__UserId=${FINAPI_DatabaseConfiguration__FinaApiDb__UserId}"
     ports:
       - 12345:80
       - 44319:443

@@ -1,6 +1,5 @@
 ﻿using Finance.Business.Models;
 using Finance.Business.Services;
-using Finance.Web.Api.Authorization;
 using Finance.Web.Api.Extensions;
 using Finance.Web.Api.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -35,7 +34,6 @@ namespace Finance.Web.Api.Controllers
         }
 
         [Route("{accountId}")]
-        [Authorize(Policies.AccountOwner)]
         [HttpDelete]
         public async Task Delete(int accountId)
         {
