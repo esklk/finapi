@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Finance.Data", "Finance.Dat
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{46C102D6-4951-4140-816A-8FDDC2389358}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finance.Access", "..\Finance.Access\Finance.Access.csproj", "{DD9041D2-0B51-4980-BE72-E92892A5ED17}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finance.Access", "Finance.Access\Finance.Access.csproj", "{DD9041D2-0B51-4980-BE72-E92892A5ED17}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

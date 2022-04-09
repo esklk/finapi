@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\finapi\Finance.Business\Finance.Business.csproj" />
+    <ProjectReference Include="..\Finance.Business\Finance.Business.csproj" />
   </ItemGroup>
 
 </Project>
