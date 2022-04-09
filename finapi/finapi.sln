@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Finance.Data", "Finance.Dat
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{46C102D6-4951-4140-816A-8FDDC2389358}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finance.Access", "Finance.Access\Finance.Access.csproj", "{DD9041D2-0B51-4980-BE72-E92892A5ED17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Finance.Access", "Finance.Access\Finance.Access.csproj", "{DD9041D2-0B51-4980-BE72-E92892A5ED17}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finance.Bot.Telegram", "Finance.Bot.Telegram\Finance.Bot.Telegram.csproj", "{07E11842-8063-426B-991E-3059F794C2FD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,6 +40,10 @@ Global
 		{DD9041D2-0B51-4980-BE72-E92892A5ED17}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DD9041D2-0B51-4980-BE72-E92892A5ED17}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DD9041D2-0B51-4980-BE72-E92892A5ED17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07E11842-8063-426B-991E-3059F794C2FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07E11842-8063-426B-991E-3059F794C2FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07E11842-8063-426B-991E-3059F794C2FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07E11842-8063-426B-991E-3059F794C2FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
