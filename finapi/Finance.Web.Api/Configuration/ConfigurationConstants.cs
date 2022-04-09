@@ -2,7 +2,6 @@
 {
     public class ConfigurationConstants
     {
-        public const string DatabaseConfiguration = "DatabaseConfiguration";
         public const string OAuthConfiguration = "OAuthConfiguration";
         public const string JwtConfiguration = "JwtConfiguration";
     }

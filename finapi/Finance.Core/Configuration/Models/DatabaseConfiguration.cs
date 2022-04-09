@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Finance.Web.Api.Configuration.Implementation
+namespace Finance.Core.Configuration.Models
 {
     public class DatabaseConfiguration
     {

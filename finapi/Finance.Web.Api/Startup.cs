@@ -1,6 +1,8 @@
 using Finance.Business.Mapping;
 using Finance.Business.Services;
 using Finance.Business.Services.Implementation;
+using Finance.Core.Configuration;
+using Finance.Core.Configuration.Models;
 using Finance.Data;
 using Finance.Web.Api.Authorization.Handlers;
 using Finance.Web.Api.Configuration;
@@ -70,7 +72,7 @@ namespace Finance.Web.Api
                 .AddScoped<IOperationService, OperationService>()
                 .AddScoped<IUserService, UserService>();
 
-            Dictionary<string, OAuthConfiguration> oauthConfigs = Configuration.GetConfigurationDictionary<OAuthConfiguration>(ConfigurationConstants.OAuthConfiguration);
+            Dictionary<string, OAuthConfiguration> oauthConfigs = Configuration.GetConfigurationDictionary<OAuthConfiguration>(Api.Configuration.ConfigurationConstants.OAuthConfiguration);
             services.AddSingleton<IDictionary<string, OAuthConfiguration>>(oauthConfigs);
 
             services.AddHttpClient();
