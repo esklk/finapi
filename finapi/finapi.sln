@@ -1,21 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31129.286
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32922.545
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Finance.Web.Api", "Finance.Web.Api\Finance.Web.Api.csproj", "{ED99DF31-79C6-4ABC-B14A-BF72F3FF164F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Finance.Business", "Finance.Business\Finance.Business.csproj", "{0E66FF4E-24B9-4180-BF95-DD3FA117231F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Finance.Data", "Finance.Data\Finance.Data.csproj", "{0D4A4B30-8015-4997-9A58-D3AD6696F8CB}"
 EndProject
-Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{46C102D6-4951-4140-816A-8FDDC2389358}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Finance.Access", "Finance.Access\Finance.Access.csproj", "{DD9041D2-0B51-4980-BE72-E92892A5ED17}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finance.Bot.Telegram", "Finance.Bot.Telegram\Finance.Bot.Telegram.csproj", "{07E11842-8063-426B-991E-3059F794C2FD}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finance.Core", "Finance.Core\Finance.Core.csproj", "{19850FBF-D482-4CC9-AF2C-F3386DDFE45A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Finance.Core", "Finance.Core\Finance.Core.csproj", "{19850FBF-D482-4CC9-AF2C-F3386DDFE45A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,9 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{ED99DF31-79C6-4ABC-B14A-BF72F3FF164F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ED99DF31-79C6-4ABC-B14A-BF72F3FF164F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ED99DF31-79C6-4ABC-B14A-BF72F3FF164F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0E66FF4E-24B9-4180-BF95-DD3FA117231F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0E66FF4E-24B9-4180-BF95-DD3FA117231F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E66FF4E-24B9-4180-BF95-DD3FA117231F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -34,18 +23,6 @@ Global
 		{0D4A4B30-8015-4997-9A58-D3AD6696F8CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D4A4B30-8015-4997-9A58-D3AD6696F8CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D4A4B30-8015-4997-9A58-D3AD6696F8CB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{46C102D6-4951-4140-816A-8FDDC2389358}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{46C102D6-4951-4140-816A-8FDDC2389358}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{46C102D6-4951-4140-816A-8FDDC2389358}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{46C102D6-4951-4140-816A-8FDDC2389358}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DD9041D2-0B51-4980-BE72-E92892A5ED17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DD9041D2-0B51-4980-BE72-E92892A5ED17}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DD9041D2-0B51-4980-BE72-E92892A5ED17}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DD9041D2-0B51-4980-BE72-E92892A5ED17}.Release|Any CPU.Build.0 = Release|Any CPU
-		{07E11842-8063-426B-991E-3059F794C2FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{07E11842-8063-426B-991E-3059F794C2FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{07E11842-8063-426B-991E-3059F794C2FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{07E11842-8063-426B-991E-3059F794C2FD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{19850FBF-D482-4CC9-AF2C-F3386DDFE45A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{19850FBF-D482-4CC9-AF2C-F3386DDFE45A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19850FBF-D482-4CC9-AF2C-F3386DDFE45A}.Release|Any CPU.ActiveCfg = Release|Any CPU
