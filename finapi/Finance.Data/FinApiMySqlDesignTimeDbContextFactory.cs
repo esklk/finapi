@@ -6,19 +6,18 @@ namespace Finance.Data
 {
     public class FinApiMySqlDesignTimeDbContextFactory : IDesignTimeDbContextFactory<FinApiDbContext>
     {
+        private const string FinapiDatabaseConnectionStringEnvVarName =
+            "FINAPI_DatabaseConfiguration__ConnectionString";
+
         public FinApiDbContext CreateDbContext(string[] args)
         {
+            var connectionString = Environment.GetEnvironmentVariable(FinapiDatabaseConnectionStringEnvVarName) ??
+                                   throw new InvalidOperationException(
+                                       $"Environment variable \"{FinapiDatabaseConnectionStringEnvVarName}\"is missing.");
             var optionsBuilder = new DbContextOptionsBuilder<FinApiDbContext>();
-            optionsBuilder.UseMySql($"server={GetValue("Server")};port={GetValue("Port")};database={GetValue("Database")};UserId={GetValue("UserId")};Password={GetValue("Password")}", new MySqlServerVersion("8.0.21"));
-
+            optionsBuilder.UseSqlServer(
+                connectionString);
             return new FinApiDbContext(optionsBuilder.Options);
-        }
-
-        private static string GetValue(string name)
-        {
-            var fullName = $"FINAPI_DatabaseConfiguration__FinaApiDb__{name}";
-
-            return Environment.GetEnvironmentVariable(fullName) ?? throw new InvalidOperationException($"Failed to get environment variable: {fullName}.");
         }
     }
 }

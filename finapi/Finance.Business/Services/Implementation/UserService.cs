@@ -3,7 +3,6 @@ using Finance.Business.Models;
 using Finance.Data;
 using Finance.Data.Models;
 using Microsoft.EntityFrameworkCore;
-using MySqlConnector;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -59,7 +58,7 @@ namespace Finance.Business.Services.Implementation
                 await _context.SaveChangesAsync();
             }
             catch(DbUpdateException ex) 
-            when (ex?.InnerException is MySqlException mySqlEx && mySqlEx.ErrorCode == MySqlErrorCode.DuplicateKeyEntry)
+            //when (ex?.InnerException is MySqlException mySqlEx && mySqlEx.ErrorCode == MySqlErrorCode.DuplicateKeyEntry)
             {
                 throw new InvalidOperationException("Login with given Provider and Identifier already exists.", ex);
             }

@@ -3,7 +3,6 @@ using Finance.Business.Models;
 using Finance.Data;
 using Finance.Data.Models;
 using Microsoft.EntityFrameworkCore;
-using MySqlConnector;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -43,7 +42,7 @@ namespace Finance.Business.Services.Implementation
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException ex)
-            when (ex?.InnerException is MySqlException mySqlEx && mySqlEx.ErrorCode == MySqlErrorCode.NoReferencedRow2)
+            //when (ex?.InnerException is MySqlException mySqlEx && mySqlEx.ErrorCode == MySqlErrorCode.NoReferencedRow2)
             {
                 throw new ArgumentException("Account with given Id does not exist.", nameof(accountId));
             }
