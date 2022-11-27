@@ -1,5 +1,9 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
+using Finance.Bot.Business.Models;
+using Finance.Bot.Business.Services;
+using Finance.Bot.Business.Services.Implementation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -10,6 +14,7 @@ using Newtonsoft.Json;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Finance.Bot.Telegram
 {
@@ -63,15 +68,63 @@ namespace Finance.Bot.Telegram
             var request = await req.ReadAsStringAsync();
             var update = JsonConvert.DeserializeObject<Update>(request);
 
-            if (update.Type != UpdateType.Message || update.Message!.Type != MessageType.Text)
+            long? chatId = update.Message?.Chat.Id ?? update.CallbackQuery?.Message?.Chat.Id;
+            if (chatId == null)
             {
                 return;
             }
 
-            await _botClient.SendTextMessageAsync(
-                chatId: update.Message.Chat.Id,
-                text: $"Received a message: {update.Message.Text}.");
+            string commandText;
+            switch (update.Type)
+            {
+                case UpdateType.Message:
+                    commandText = update.Message.Text;
+                    break;
+                case UpdateType.CallbackQuery:
+                    commandText = update.CallbackQuery?.Data;
+                    break;
+                default:
+                    await _botClient.SendTextMessageAsync(
+                        chatId: chatId,
+                        text: "ERROR: Update type is not supported.");
+                    return;
+            }
 
+            if (string.IsNullOrWhiteSpace(commandText))
+            {
+                await _botClient.SendTextMessageAsync(
+                    chatId: chatId,
+                    text: "ERROR: Message is empty.");
+                return;
+            }
+
+
+            MessageResponse response = await new StartedStateMessageProcessor(new State()).ProcessAsync(commandText);
+
+            await _botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: response.Text,
+                replyMarkup: GetReplyMarkup(response));
+        }
+
+        IReplyMarkup? GetReplyMarkup(MessageResponse response)
+        {
+            if (response.Options != null && response.Options.Any())
+            {
+                return new ReplyKeyboardMarkup(new[]
+                {
+                    response.Options.Select(x => new KeyboardButton(x))
+
+                });
+            }
+
+            if (response.TaggedOptions != null && response.TaggedOptions.Any())
+            {
+                return new InlineKeyboardMarkup(new[]
+                    { response.TaggedOptions.Select(x => InlineKeyboardButton.WithCallbackData(x.Key, x.Value)) });
+            }
+
+            return null;
         }
     }
 }
