@@ -4,7 +4,6 @@ using Finance.Data;
 using Finance.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Finance.Business.Services.Implementation
@@ -20,36 +19,16 @@ namespace Finance.Business.Services.Implementation
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<UserModel> GetUserAsync(string loginProvider, string loginIdentifier)
+        public async Task<UserModel> GetUserAsync(int id)
         {
-            if (string.IsNullOrWhiteSpace(loginProvider))
-            {
-                throw new ArgumentException("The value must not be null, empty or whitespace string.", nameof(loginProvider));
-            }
-            if (string.IsNullOrWhiteSpace(loginIdentifier))
-            {
-                throw new ArgumentException("The value must not be null, empty or whitespace string.", nameof(loginIdentifier));
-            }
+            var user = await _context.FindAsync<User>(id);
 
-            var query = _context.UserLogins.Where(x => x.Provider == loginProvider && x.Identifier == loginIdentifier).Select(x => x.User);
-
-            return await _mapper.ProjectTo<UserModel>(query).SingleOrDefaultAsync();
+            return _mapper.Map<UserModel>(user);
         }
 
-        public async Task<UserModel> CreateUserAsync(string name, string loginProvider, string loginIdentifier)
+        public async Task<UserModel> CreateUserAsync(UserModel user)
         {
-            var userToSave = new User
-            {
-                Name = name,
-                UserLogins = new[]
-                {
-                    new UserLogin
-                    {
-                        Provider = loginProvider,
-                        Identifier = loginIdentifier
-                    }
-                }
-            };
+            var userToSave = _mapper.Map<User>(user);
 
             _context.Users.Add(userToSave);
 
@@ -57,10 +36,9 @@ namespace Finance.Business.Services.Implementation
             {
                 await _context.SaveChangesAsync();
             }
-            catch(DbUpdateException ex) 
-            //when (ex?.InnerException is MySqlException mySqlEx && mySqlEx.ErrorCode == MySqlErrorCode.DuplicateKeyEntry)
+            catch(DbUpdateException ex)
             {
-                throw new InvalidOperationException("Login with given Provider and Identifier already exists.", ex);
+                throw new Exception("Failed to create a user.", ex);
             }
 
             return _mapper.Map<UserModel>(userToSave);
