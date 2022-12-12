@@ -8,7 +8,8 @@ namespace Finance.Business.Mapping
     {
         public DefaultMappingProfile()
         {
-            CreateMap<User, UserModel>();
+            CreateMap<UserLogin, UserLoginModel>().ReverseMap();
+            CreateMap<User, UserModel>().ReverseMap();
             CreateMap<Account, AccountModel>();
             CreateMap<OperationCategory, OperationCategoryModel>();
             CreateMap<Operation, OperationModel>();

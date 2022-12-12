@@ -1,0 +1,8 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "TelegramBotToken": "9176583992:AAH61vb4OpAHqLOX92pb0558tNoEP1MtDVs"
+  }
+}

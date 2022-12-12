@@ -14,11 +14,17 @@ namespace Finance.Bot.Business.Services.Implementation
             _statefulMessageProcessorFactory = statefulMessageProcessorFactory ?? throw new ArgumentNullException(nameof(statefulMessageProcessorFactory));
         }
 
-        public async Task<MessageResponse> ProcessAsync(string text)
+        public async Task<MessageResponse> ProcessAsync(string? text)
         {
-            var state = await _stateService.GetStateAsync();
-            var response = await _statefulMessageProcessorFactory.Create(state).ProcessAsync(text);
-            await _stateService.UpdateStateAsync(state);
+            State? state = await _stateService.GetStateAsync();
+            if (state == null)
+            {
+                throw new InvalidOperationException("Cannot retrieve state to process message.");
+            }
+
+            MessageResponse response = await _statefulMessageProcessorFactory.Create(state).ProcessAsync(text);
+            
+            await _stateService.SetStateAsync(state);
 
             return response;
         }

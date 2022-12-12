@@ -1,60 +1,66 @@
-using Finance.Bot.Telegram.Configuration.Implementation;
-using Finance.Bot.Telegram.Services.Implementation;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
+﻿using System;
+using Finance.Bot.Business.Models;
+using Finance.Bot.Data.Models;
+using Finance.Business.Services;
+using Finance.Business.Services.Implementation;
+using Finance.Core.Practices;
+using Finance.Data;
+using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using System;
-using System.Threading.Tasks;
 using Telegram.Bot;
+
+using BusinessDefaultMappingProfile = Finance.Business.Mapping.DefaultMappingProfile;
+using BotBusinessDefaultMappingProfile = Finance.Bot.Business.Mapping.DefaultMappingProfile;
+using Finance.Bot.Data.Services.Implementation;
+using Finance.Bot.Business.Services;
+using Finance.Bot.Business.Services.Implementation;
+using Finance.Bot.Telegram.Services;
+using Finance.Bot.Telegram.Services.Implementation;
+using Telegram.Bot.Types;
+
+[assembly: FunctionsStartup(typeof(Finance.Bot.Telegram.Startup))]
 
 namespace Finance.Bot.Telegram
 {
-    public class Startup
+    public class Startup : FunctionsStartup
     {
-        private readonly TelegramBotConfiguration botConfiguration;
+        private const string AzureStorageConnectionString = "AzureStorageConnectionString";
+        private const string TelegramAppName = "Telegram";
+        private const string TelegramBotToken = "TelegramBotToken";
 
-        public Startup(IConfiguration configuration)
+        public override void Configure(IFunctionsHostBuilder builder)
         {
-            if(configuration == null)
-            {
-                throw new ArgumentNullException(nameof(configuration));
-            }
+            builder.Services.AddDbContext<FinApiDbContext>(x =>
+                x.UseSqlServer(
+                    GetSetting(FinApiMySqlDesignTimeDbContextFactory.FinapiDatabaseConnectionStringEnvVarName)));
 
-            botConfiguration = configuration.Get<TelegramBotConfiguration>();
+            builder.Services
+                .AddAutoMapper(typeof(BusinessDefaultMappingProfile))
+                .AddScoped<IUserService, UserService>()
+                .AddScoped<IUserLoginService, UserLoginService>();
+
+            builder.Services
+                .AddScoped<IRepository<StateEntity, string>, AzureTableEntityRepository<StateEntity>>(x =>
+                new AzureTableEntityRepository<StateEntity>(GetSetting(AzureStorageConnectionString), TelegramAppName));
+
+            builder.Services
+                .AddAutoMapper(typeof(BotBusinessDefaultMappingProfile))
+                .AddScoped<IFactory<IStateService, string>, StateServiceFactory>()
+                .AddScoped<IFactory<IMessageProcessor, State>, StatefulMessageProcessorFactory>()
+                .AddScoped<IFactory<IMessageProcessor, IStateService>, StateServiceStatefulMessageProcessorFactory>();
+
+            builder.Services
+                .AddSingleton<ITelegramBotClient>(new TelegramBotClient(GetSetting(TelegramBotToken)))
+                .AddScoped<IFactory<IUpdateService, Update>, UpdateServiceFactory>()
+                .AddScoped<IFactory<IStateService, Update>, TelegramStateServiceFactory>(x =>
+                    new TelegramStateServiceFactory(x, typeof(StartedStateMessageProcessor)));
         }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
-        public void ConfigureServices(IServiceCollection services)
+        private static string GetSetting(string key)
         {
-            services.AddSingleton(botConfiguration);
-
-            services.AddHostedService<TelegramBotHostedService>();
-
-            services.AddHttpClient("tgwebhook")
-                    .AddTypedClient<ITelegramBotClient>(httpClient
-                        => new TelegramBotClient(botConfiguration.Token, httpClient));
-        }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.UseRouting()
-                .UseCors()
-                .UseEndpoints(endpoints => endpoints.MapPost(botConfiguration.WebhookUrl.PathAndQuery, OnUpdate));
-        }
-
-        private static async Task OnUpdate(HttpContext context)
-        {
-            await context.Response.WriteAsync("Hello World!");
+            return Environment.GetEnvironmentVariable(key, EnvironmentVariableTarget.Process) ??
+                   throw new InvalidOperationException($"Environment variable \"{key}\" is missing.");
         }
     }
 }

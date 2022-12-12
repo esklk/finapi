@@ -14,7 +14,7 @@ namespace Finance.Bot.Business.Services.Implementation
             _state = state ?? throw new ArgumentNullException(nameof(state));
         }
 
-        public Task<MessageResponse> ProcessAsync(string text)
+        public Task<MessageResponse> ProcessAsync(string? text)
         {
             var response = new MessageResponse(WelcomeMessage, Commands.CreateAccount, Commands.Help);
 

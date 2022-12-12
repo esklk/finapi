@@ -4,6 +4,6 @@ namespace Finance.Bot.Business.Services
 {
     public interface IMessageProcessor
     {
-        Task<MessageResponse> ProcessAsync(string text);
+        Task<MessageResponse> ProcessAsync(string? text);
     }
 }

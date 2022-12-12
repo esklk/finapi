@@ -3,20 +3,28 @@ using Finance.Core.Practices;
 
 namespace Finance.Bot.Data.Services.Implementation
 {
-    public class TableEntityRepository<TEntity> : IRepository<TEntity, string> where TEntity: class, ITableEntity, new()
+    public class AzureTableEntityRepository<TEntity> : IRepository<TEntity, string> where TEntity: class, ITableEntity, new()
     {
         private readonly TableClient _client;
         private readonly string _appName;
 
-        public TableEntityRepository(TableClient client, string appName)
+        public AzureTableEntityRepository(string connectionString, string appName) : this(
+            new TableClient(connectionString, TableName), appName)
+        {
+        }
+
+        public AzureTableEntityRepository(TableClient client, string appName)
         {
             if (string.IsNullOrWhiteSpace(appName))
             {
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(appName));
             }
             _client = client ?? throw new ArgumentNullException(nameof(client));
+            _client.CreateIfNotExists();
             _appName = appName;
         }
+
+        private static string TableName => typeof(TEntity).Name.Replace("Entity", string.Empty) + "Entities";
 
         public async Task DeleteAsync(string id)
         {
@@ -38,7 +46,7 @@ namespace Finance.Bot.Data.Services.Implementation
         public async Task UpdateAsync(TEntity entity)
         {
             entity.PartitionKey = _appName;
-            await _client.UpdateEntityAsync(entity, entity.ETag, TableUpdateMode.Replace);
+            await _client.UpsertEntityAsync(entity, TableUpdateMode.Replace);
         }
     }
 }

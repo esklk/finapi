@@ -6,7 +6,7 @@ namespace Finance.Data
 {
     public class FinApiMySqlDesignTimeDbContextFactory : IDesignTimeDbContextFactory<FinApiDbContext>
     {
-        private const string FinapiDatabaseConnectionStringEnvVarName =
+        public const string FinapiDatabaseConnectionStringEnvVarName =
             "FINAPI_DatabaseConfiguration__ConnectionString";
 
         public FinApiDbContext CreateDbContext(string[] args)
