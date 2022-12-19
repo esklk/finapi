@@ -2,7 +2,7 @@
   "profiles": {
     "Finance.Bot.Telegram": {
       "commandName": "Project",
-      "commandLineArgs": "--port 7288",
+      "commandLineArgs": "--port 7067",
       "launchBrowser": false
     }
   }

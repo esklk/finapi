@@ -1,9 +1,7 @@
-﻿using System;
-using System.Linq;
+﻿using Finance.Bot.Business.Models;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
-using Finance.Bot.Business.Models;
 
 namespace Finance.Bot.Telegram
 {
@@ -11,7 +9,7 @@ namespace Finance.Bot.Telegram
     {
         public static IReplyMarkup? BuildReplyMarkup(this MessageResponse response)
         {
-            if (response.Options != null && response.Options.Any())
+            if (response.Options.Any())
             {
                 return new ReplyKeyboardMarkup(new[]
                 {
@@ -19,7 +17,7 @@ namespace Finance.Bot.Telegram
                 });
             }
 
-            if (response.TaggedOptions != null && response.TaggedOptions.Any())
+            if (response.TaggedOptions.Any())
             {
                 return new InlineKeyboardMarkup(new[]
                     { response.TaggedOptions.Select(x => InlineKeyboardButton.WithCallbackData(x.Key, x.Value)) });

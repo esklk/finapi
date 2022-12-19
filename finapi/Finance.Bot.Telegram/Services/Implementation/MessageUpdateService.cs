@@ -1,7 +1,5 @@
 ﻿using Finance.Bot.Business.Models;
 using Finance.Bot.Business.Services;
-using System;
-using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -23,7 +21,7 @@ namespace Finance.Bot.Telegram.Services.Implementation
         {
             if (update.Type != UpdateType.Message)
             {
-                throw new ArgumentException($"Update type should be ${UpdateType.Message}", nameof(update));
+                throw new ArgumentException($"UpdateHandling type should be ${UpdateType.Message}", nameof(update));
             }
 
             MessageResponse response = await _messageProcessor.ProcessAsync(update.Message?.Text);

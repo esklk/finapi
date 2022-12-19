@@ -1,8 +1,5 @@
-﻿using System;
-using Finance.Bot.Business.Services;
-using Finance.Core.Practices;
+﻿using Finance.Core.Practices;
 using Microsoft.Extensions.DependencyInjection;
-using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -23,7 +20,7 @@ namespace Finance.Bot.Telegram.Services.Implementation
             {
                 UpdateType.Message => _serviceProvider.GetRequiredService<MessageUpdateService>(),
                 UpdateType.CallbackQuery => _serviceProvider.GetRequiredService<CallbackQueryUpdateService>(),
-                _ => throw new ArgumentException($"Update type cannot be {update.Type}.", nameof(update))
+                _ => throw new ArgumentException($"UpdateHandling type cannot be {update.Type}.", nameof(update))
             };
         }
     }

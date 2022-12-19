@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "Finance.Bot.Telegram": {
-      "commandName": "Project",
-      "commandLineArgs": "--port 7288",
-      "launchBrowser": false
-    }
-  }
-}

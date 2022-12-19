@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Finance.Bot.Telegram.Configuration.Implementation
+﻿namespace Finance.Bot.Telegram.Configuration.Implementation
 {
     public class TelegramBotConfiguration
     {

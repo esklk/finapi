@@ -1,6 +1,5 @@
 ﻿using Finance.Bot.Business.Services.Implementation.Stateful;
 using Finance.Business.Services;
-using System;
 using Telegram.Bot.Types;
 
 namespace Finance.Bot.Telegram.Services.Implementation

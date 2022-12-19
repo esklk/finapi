@@ -1,14 +1,5 @@
-﻿using AutoMapper;
-using Finance.Bot.Business.Models;
-using Finance.Bot.Business.Services;
-using Finance.Bot.Business.Services.Implementation;
-using Finance.Bot.Data.Models;
+﻿using Finance.Bot.Business.Services;
 using Finance.Core.Practices;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Finance.Bot.Telegram.Services.Implementation
 {
