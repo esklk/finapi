@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Azure;
 using Finance.Bot.Business.Models;
 using Finance.Bot.Business.Services;
 using Telegram.Bot;

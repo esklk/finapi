@@ -6,9 +6,9 @@ namespace Finance.Bot.Business.Services.Implementation
     public class StatefulMessageProcessor : IMessageProcessor
     {
         private readonly IStateService _stateService;
-        private readonly IFactory<IMessageProcessor, State> _statefulMessageProcessorFactory;
+        private readonly IFactory<IStatefulMessageProcessor, Type> _statefulMessageProcessorFactory;
 
-        public StatefulMessageProcessor(IStateService stateService, IFactory<IMessageProcessor, State> statefulMessageProcessorFactory)
+        public StatefulMessageProcessor(IStateService stateService, IFactory<IStatefulMessageProcessor, Type> statefulMessageProcessorFactory)
         {
             _stateService = stateService ?? throw new ArgumentNullException(nameof(stateService));
             _statefulMessageProcessorFactory = statefulMessageProcessorFactory ?? throw new ArgumentNullException(nameof(statefulMessageProcessorFactory));
@@ -22,7 +22,9 @@ namespace Finance.Bot.Business.Services.Implementation
                 throw new InvalidOperationException("Cannot retrieve state to process message.");
             }
 
-            MessageResponse response = await _statefulMessageProcessorFactory.Create(state).ProcessAsync(text);
+            MessageResponse response = await _statefulMessageProcessorFactory
+                .Create(state.ProcessorType)
+                .ProcessAsync(state, text);
             
             await _stateService.SetStateAsync(state);
 

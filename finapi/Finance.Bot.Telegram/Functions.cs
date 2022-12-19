@@ -7,10 +7,13 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Newtonsoft.Json;
 
 namespace Finance.Bot.Telegram
 {
@@ -22,11 +25,13 @@ namespace Finance.Bot.Telegram
 
         private readonly ITelegramBotClient _botClient;
         private readonly IFactory<IUpdateService, Update> _updateServiceFactory;
+        private readonly IUpdateProvider _updateProvider;
 
-        public Functions(ITelegramBotClient botClient, IFactory<IUpdateService, Update> updateServiceFactory)
+        public Functions(ITelegramBotClient botClient, IFactory<IUpdateService, Update> updateServiceFactory, IUpdateProvider updateProvider)
         {
             _botClient = botClient ?? throw new ArgumentNullException(nameof(botClient));
             _updateServiceFactory = updateServiceFactory ?? throw new ArgumentNullException(nameof(updateServiceFactory));
+            _updateProvider = updateProvider ?? throw new ArgumentNullException(nameof(updateProvider));
         }
 
         [FunctionName(Start)]
@@ -61,13 +66,20 @@ namespace Finance.Bot.Telegram
         [FunctionName(Update)]
         public async Task UpdateAsync(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
+            FunctionContext functionContext,
             ILogger log)
         {
-            string request = await req.ReadAsStringAsync();
-            var update = JsonConvert.DeserializeObject<Update>(request);
-            if (update != null)
+
+            try
             {
+                Update update = _updateProvider.Update;
+                log.LogInformation($"UpdateProvider: {JsonConvert.SerializeObject(update)}");
+                log.LogInformation($"Req: {await req.ReadAsStringAsync()}");
                 await _updateServiceFactory.Create(update).HandleAsync(update);
+            }
+            catch(Exception ex)
+            {
+                log.LogError(0, ex, $"Update failed: {ex.Message}");
             }
         }
     }

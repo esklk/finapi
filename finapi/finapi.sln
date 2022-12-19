@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Finance.Bot.Data", "Finance
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Finance.Bot.Telegram", "Finance.Bot.Telegram\Finance.Bot.Telegram.csproj", "{18990CBB-49A6-4B61-8B56-EA2F9C608174}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finance.Bot.Business.Tests", "Finance.Bot.Business.Tests\Finance.Bot.Business.Tests.csproj", "{FF7E2D2E-ABCF-4835-81A4-C564C53311E9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Finance.Bot.Business.Tests", "Finance.Bot.Business.Tests\Finance.Bot.Business.Tests.csproj", "{FF7E2D2E-ABCF-4835-81A4-C564C53311E9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

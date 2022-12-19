@@ -4,4 +4,9 @@
     {
         TObject Create(TArgument argument);
     }
+
+    public interface IFactory<TObject>
+    {
+        TObject Create();
+    }
 }

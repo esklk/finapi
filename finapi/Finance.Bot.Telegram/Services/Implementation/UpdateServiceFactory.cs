@@ -21,21 +21,10 @@ namespace Finance.Bot.Telegram.Services.Implementation
         {
             return update.Type switch
             {
-                UpdateType.Message => new MessageUpdateService(BuildMessageProcessor(update), _serviceProvider.GetRequiredService<ITelegramBotClient>()),
-                UpdateType.CallbackQuery => new CallbackQueryUpdateService(BuildMessageProcessor(update), _serviceProvider.GetRequiredService<ITelegramBotClient>()),
+                UpdateType.Message => _serviceProvider.GetRequiredService<MessageUpdateService>(),
+                UpdateType.CallbackQuery => _serviceProvider.GetRequiredService<CallbackQueryUpdateService>(),
                 _ => throw new ArgumentException($"Update type cannot be {update.Type}.", nameof(update))
             };
-        }
-
-        private IMessageProcessor BuildMessageProcessor(Update update)
-        {
-            IStateService stateService = _serviceProvider
-                .GetRequiredService<IFactory<IStateService, Update>>()
-                .Create(update);
-
-            return _serviceProvider
-                .GetRequiredService<IFactory<IMessageProcessor, IStateService>>()
-                .Create(stateService);
         }
     }
 }

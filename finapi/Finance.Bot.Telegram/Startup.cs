@@ -1,5 +1,4 @@
 ﻿using System;
-using Finance.Bot.Business.Models;
 using Finance.Bot.Data.Models;
 using Finance.Business.Services;
 using Finance.Business.Services.Implementation;
@@ -18,8 +17,10 @@ using Finance.Bot.Business.Services.Implementation;
 using Finance.Bot.Telegram.Services;
 using Finance.Bot.Telegram.Services.Implementation;
 using Telegram.Bot.Types;
+using Finance.Bot.Business.Services.Implementation.Stateful;
+using Functions.Worker.ContextAccessor;
 
-[assembly: FunctionsStartup(typeof(Finance.Bot.Telegram.Startup))]
+//[assembly: FunctionsStartup(typeof(Finance.Bot.Telegram.Startup))]
 
 namespace Finance.Bot.Telegram
 {
@@ -45,16 +46,27 @@ namespace Finance.Bot.Telegram
                 new AzureTableEntityRepository<StateEntity>(GetSetting(AzureStorageConnectionString), TelegramAppName));
 
             builder.Services
+                .AddScoped<IMessageProcessor, StatefulMessageProcessor>()
                 .AddAutoMapper(typeof(BotBusinessDefaultMappingProfile))
-                .AddScoped<IFactory<IStateService, string>, StateServiceFactory>()
-                .AddScoped<IFactory<IMessageProcessor, State>, StatefulMessageProcessorFactory>()
-                .AddScoped<IFactory<IMessageProcessor, IStateService>, StateServiceStatefulMessageProcessorFactory>();
+                .AddScoped<IFactory<IStateService, string>, StateServiceFactory>(c => new StateServiceFactory(c.GetRequiredService<IServiceProvider>(), typeof(TelegramStartedMessageProcessor)))
+                .AddScoped<IFactory<IStatefulMessageProcessor, Type>, ServiceProviderFactory<IStatefulMessageProcessor>>()
+                .AddScoped<SignedInMessageProcessor>();
 
             builder.Services
+                .AddFunctionContextAccessor()
+                .AddSingleton<IUpdateProvider, HttpContextUpdateProvider>()
                 .AddSingleton<ITelegramBotClient>(new TelegramBotClient(GetSetting(TelegramBotToken)))
+                .AddScoped<TelegramChatStateServiceFactory>()
+                .AddScoped<IStateService>(c => c.GetRequiredService<TelegramChatStateServiceFactory>().Create())
                 .AddScoped<IFactory<IUpdateService, Update>, UpdateServiceFactory>()
-                .AddScoped<IFactory<IStateService, Update>, TelegramStateServiceFactory>(x =>
-                    new TelegramStateServiceFactory(x, typeof(StartedStateMessageProcessor)));
+                .AddScoped<MessageUpdateService>()
+                .AddScoped<CallbackQueryUpdateService>()
+                .AddScoped<TelegramStartedMessageProcessor>();
+        }
+
+        public override void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder)
+        {
+            base.ConfigureAppConfiguration(builder);
         }
 
         private static string GetSetting(string key)

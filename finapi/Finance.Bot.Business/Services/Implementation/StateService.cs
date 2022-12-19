@@ -10,8 +10,9 @@ namespace Finance.Bot.Business.Services.Implementation
         private readonly IRepository<StateEntity, string> _repository;
         private readonly IMapper _mapper;
         private readonly string _stateId;
+        private readonly Type _initialProcessorType;
 
-        public StateService(IRepository<StateEntity, string> stateEntityRepository, IMapper mapper, string stateId)
+        public StateService(IRepository<StateEntity, string> stateEntityRepository, IMapper mapper, string stateId, Type initialProcessorType)
         {
             if (string.IsNullOrWhiteSpace(stateId))
             {
@@ -20,12 +21,14 @@ namespace Finance.Bot.Business.Services.Implementation
             _repository = stateEntityRepository ?? throw new ArgumentNullException(nameof(stateEntityRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _stateId = stateId;
+            _initialProcessorType = initialProcessorType ?? throw new ArgumentNullException(nameof(initialProcessorType));
         }
 
-        public async Task<State?> GetStateAsync()
+        public async Task<State> GetStateAsync()
         {
             StateEntity? savedState = await _repository.GetAsync(_stateId);
-            return _mapper.Map<State>(savedState);
+
+            return savedState == null? new State(_initialProcessorType) : _mapper.Map<State>(savedState);
         }
 
         public async Task SetStateAsync(State state)
