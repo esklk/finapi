@@ -46,8 +46,7 @@ namespace Finance.Bot.Telegram
                     return update.Message?.Chat ??
                            throw new ArgumentException($"Message cannot be null for update type {update.Type}.", nameof(update));
                 case UpdateType.CallbackQuery:
-                    return update.Message?.Chat ??
-                           throw new ArgumentException($"Callback Query and Message cannot be null for update type {update.Type}.", nameof(update));
+                    return update.CallbackQuery?.Message?.Chat ?? throw new ArgumentException($"Callback Query and Message cannot be null for update type {update.Type}.", nameof(update));
                 case UpdateType.ChannelPost:
                 case UpdateType.EditedChannelPost:
                     return update.ChannelPost?.Chat ??
@@ -77,7 +76,7 @@ namespace Finance.Bot.Telegram
                     return update.Message?.From ??
                            throw new ArgumentException($"Message cannot be null for update type {update.Type}.", nameof(update));
                 case UpdateType.CallbackQuery:
-                    return update.Message?.From ??
+                    return update.CallbackQuery?.Message?.From ??
                            throw new ArgumentException($"Callback Query and Message cannot be null for update type {update.Type}.", nameof(update));
                 case UpdateType.ChannelPost:
                 case UpdateType.EditedChannelPost:

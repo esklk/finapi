@@ -56,5 +56,11 @@
             return Data.TryGetValue(key, out value);
         }
 
+        public bool TryGetNumber(string key, out int value)
+        {
+            value = 0;
+            return TryGetValue(key, out var stringValue) && int.TryParse(stringValue, out value);
+        }
+
     }
 }

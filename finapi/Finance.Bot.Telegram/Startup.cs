@@ -31,12 +31,14 @@ namespace Finance.Bot.Telegram
         {
             services.AddDbContext<FinApiDbContext>(x =>
                 x.UseSqlServer(
-                    GetSetting(FinApiMySqlDesignTimeDbContextFactory.FinapiDatabaseConnectionStringEnvVarName)));
+                    GetSetting(FinApiMySqlDesignTimeDbContextFactory.FinapiDatabaseConnectionStringEnvVarName),
+                    options => options.EnableRetryOnFailure()));
 
             services
                 .AddAutoMapper(typeof(BusinessDefaultMappingProfile))
-                .AddScoped<IUserService, UserService>()
-                .AddScoped<IUserLoginService, UserLoginService>();
+                .AddScoped<IAccountService, AccountService>()
+                .AddScoped<IUserLoginService, UserLoginService>()
+                .AddScoped<IUserService, UserService>();
 
             services
                 .AddScoped<IRepository<StateEntity, string>, AzureTableEntityRepository<StateEntity>>(x =>
@@ -45,9 +47,15 @@ namespace Finance.Bot.Telegram
             services
                 .AddScoped<IMessageProcessor, StatefulMessageProcessor>()
                 .AddAutoMapper(typeof(BotBusinessDefaultMappingProfile))
-                .AddScoped<IFactory<IStateService, string>, StateServiceFactory>(c => new StateServiceFactory(c.GetRequiredService<IServiceProvider>(), typeof(TelegramStartedMessageProcessor)))
-                .AddScoped<IFactory<IStatefulMessageProcessor, Type>, ServiceProviderFactory<IStatefulMessageProcessor>>()
-                .AddScoped<SignedInMessageProcessor>();
+                .AddScoped<IFactory<IStateService, string>, StateServiceFactory>(c =>
+                    new StateServiceFactory(c.GetRequiredService<IServiceProvider>(),
+                        typeof(TelegramStartedMessageProcessor)))
+                .AddScoped<IFactory<IStatefulMessageProcessor, Type>,
+                    ServiceProviderFactory<IStatefulMessageProcessor>>()
+                .AddScoped<SignedInMessageProcessor>()
+                .AddScoped<AccountSelectingMessageProcessor>()
+                .AddScoped<AccountSelectedMessageProcessor>()
+                .AddScoped<AccountCreatingMessageProcessor>();
 
             services
                 .AddFunctionContextAccessor()
