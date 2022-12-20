@@ -48,7 +48,7 @@ namespace Finance.Bot.Business.Commands.Implementation
             {
                 _logger.LogError(ex, "Failed to create an account.");
                 await _messageSender.SendAsync(new BotMessage("Failed to create an account.", 
-                    new KeyValuePair<string, string>("Retry", $"{CommandNames.CreateAccount} {accountName}")));
+                    new KeyValuePair<string, string>("Try again", $"{CommandNames.CreateAccount} {accountName}")));
             }
         }
     }

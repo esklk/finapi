@@ -50,18 +50,17 @@ namespace Finance.Bot.Business.Commands.Implementation
 
         public async Task ExecuteAsync(State state, string[] arguments)
         {
-            if (!state.ContainsKey(StateKeys.UserId))
-            {
-                UserLoginModel? userLogin = await _userLoginService.GetUserLoginAsync(_loginProvider, _loginIdentifier);
-                if (userLogin == null)
-                {
-                    UserModel user = await _userService.CreateUserAsync(new UserModel(_firstName));
-                    userLogin = await _userLoginService.CreateUserLoginAsync(user.Id, _loginProvider,
-                        _loginIdentifier);
-                }
+            state.Data.Clear();
 
-                state[StateKeys.UserId] = userLogin.UserId;
+            UserLoginModel? userLogin = await _userLoginService.GetUserLoginAsync(_loginProvider, _loginIdentifier);
+            if (userLogin == null)
+            {
+                UserModel user = await _userService.CreateUserAsync(new UserModel(_firstName));
+                userLogin = await _userLoginService.CreateUserLoginAsync(user.Id, _loginProvider,
+                    _loginIdentifier);
             }
+
+            state[StateKeys.UserId] = userLogin.UserId;
 
             await _botMessageSender.SendAsync(new BotMessage(WelcomeMessage,
                 new KeyValuePair<string, string>("Select an account", CommandNames.SelectAccount)));

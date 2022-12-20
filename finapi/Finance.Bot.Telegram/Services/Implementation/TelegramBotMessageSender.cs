@@ -1,4 +1,5 @@
-﻿using Finance.Bot.Business.Models;
+﻿using Finance.Bot.Business.Constants;
+using Finance.Bot.Business.Models;
 using Finance.Bot.Business.Services;
 using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -7,6 +8,7 @@ namespace Finance.Bot.Telegram.Services.Implementation
 {
     public class TelegramBotMessageSender : IBotMessageSender
     {
+        private static IReplyMarkup? _defaultReplyMarkup;
         private readonly ITelegramBotClient _botClient;
         private readonly long _chatId;
 
@@ -14,6 +16,28 @@ namespace Finance.Bot.Telegram.Services.Implementation
         {
             _botClient = botClient ?? throw new ArgumentNullException(nameof(botClient));
             _chatId = updateProvider.Update.GetChat().Id;
+        }
+
+        private static IReplyMarkup DefaultReplyMarkup
+        {
+            get
+            {
+                if (_defaultReplyMarkup != null)
+                {
+                    return _defaultReplyMarkup;
+                }
+
+                _defaultReplyMarkup = new ReplyKeyboardMarkup(new[]
+                {
+                    new KeyboardButton[] { CommandNames.SelectAccount, CommandNames.CreateAccount, CommandNames.DeleteAccount },
+                    new KeyboardButton[] { CommandNames.Start, CommandNames.Help }
+                })
+                {
+                    ResizeKeyboard = true
+                };
+
+                return _defaultReplyMarkup;
+            }
         }
 
         public async Task SendAsync(BotMessage message)
@@ -40,7 +64,7 @@ namespace Finance.Bot.Telegram.Services.Implementation
                     { response.TaggedOptions.Select(x => InlineKeyboardButton.WithCallbackData(x.Key, x.Value)) });
             }
 
-            return null;
+            return DefaultReplyMarkup;
         }
     }
 }

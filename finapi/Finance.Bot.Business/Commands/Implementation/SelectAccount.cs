@@ -2,7 +2,6 @@
 using Finance.Bot.Business.Exceptions;
 using Finance.Bot.Business.Models;
 using Finance.Bot.Business.Services;
-using Finance.Bot.Business.Services.Implementation;
 using Finance.Business.Models;
 using Finance.Business.Services;
 
@@ -27,7 +26,8 @@ namespace Finance.Bot.Business.Commands.Implementation
             }
 
             AccountModel[] accounts = await _accountService.GetAccountsAsync(userId);
-            if (arguments.Any() && int.TryParse(arguments[0], out int accountId) && accounts.Any(x => x.Id == accountId))
+            if (arguments.Any() && int.TryParse(arguments[0], out int accountId) &&
+                accounts.Any(x => x.Id == accountId))
             {
                 state[StateKeys.SelectedAccountId] = accountId;
                 await _messageSender.SendAsync(new BotMessage("Account selected."));
@@ -35,7 +35,7 @@ namespace Finance.Bot.Business.Commands.Implementation
             }
 
             KeyValuePair<string, string>[] responseOptions = accounts
-                .Select(x => new KeyValuePair<string, string>(x.Name, $"{CommandNames.SelectAccount} {x.Id}"))
+                .Select(x => new KeyValuePair<string, string>(x.Name, x.Id.ToString()))
                 .Append(new KeyValuePair<string, string>("Create account", "/createAccount"))
                 .ToArray();
 

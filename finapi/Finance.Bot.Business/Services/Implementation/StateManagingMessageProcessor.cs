@@ -2,7 +2,6 @@
 using Finance.Bot.Business.Constants;
 using Finance.Bot.Business.Models;
 using Finance.Core.Practices;
-using System.Linq;
 
 namespace Finance.Bot.Business.Services.Implementation
 {

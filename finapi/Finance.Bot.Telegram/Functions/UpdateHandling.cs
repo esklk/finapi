@@ -30,8 +30,7 @@ namespace Finance.Bot.Telegram.Functions
             }
             catch (Exception ex)
             {
-                ex.Data["body"] = await req.ReadAsStringAsync();
-                _logger.LogError(ex, "Update handling failed");
+                _logger.LogError(ex, $"Update handling failed.\n{await req.ReadAsStringAsync()}");
             }
         }
     }
