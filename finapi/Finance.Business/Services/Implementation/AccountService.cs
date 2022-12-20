@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Finance.Business.Exceptions;
 
 namespace Finance.Business.Services.Implementation
 {
@@ -29,7 +30,12 @@ namespace Finance.Business.Services.Implementation
 
         public async Task<AccountModel> CreateAccountAsync(string name, int userId)
         {
-            User user = await _context.Users.FindAsync(userId);
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentNullOrWhitespaceStringException(nameof(name));
+            }
+
+            User? user = await _context.Users.FindAsync(userId);
             if(user == null)
             {
                 throw new ArgumentException("User with given Id not found.", nameof(userId));

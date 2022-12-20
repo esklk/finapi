@@ -1,21 +1,21 @@
 ﻿namespace Finance.Bot.Business.Models
 {
-    public class MessageResponse
+    public class BotMessage
     {
-        public MessageResponse(string text)
+        public BotMessage(string text)
         {
             Text = text;
             TaggedOptions = Array.Empty<KeyValuePair<string, string>>();
             Options = Array.Empty<string>();
         }
 
-        public MessageResponse(string text, params string[] options)
+        public BotMessage(string text, params string[] options)
         {
             Text = text;
             Options = options;
             TaggedOptions = Array.Empty<KeyValuePair<string, string>>();
         }
-        public MessageResponse(string text, params KeyValuePair<string, string>[] taggedOptions)
+        public BotMessage(string text, params KeyValuePair<string, string>[] taggedOptions)
         {
             Text = text;
             TaggedOptions = taggedOptions;

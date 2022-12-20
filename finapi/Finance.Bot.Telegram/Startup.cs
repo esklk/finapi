@@ -1,4 +1,6 @@
-﻿using Finance.Bot.Data.Models;
+﻿using Finance.Bot.Business.Commands;
+using Finance.Bot.Business.Commands.Implementation;
+using Finance.Bot.Data.Models;
 using Finance.Business.Services;
 using Finance.Business.Services.Implementation;
 using Finance.Core.Practices;
@@ -15,7 +17,6 @@ using Finance.Bot.Business.Services.Implementation;
 using Finance.Bot.Telegram.Services;
 using Finance.Bot.Telegram.Services.Implementation;
 using Telegram.Bot.Types;
-using Finance.Bot.Business.Services.Implementation.Stateful;
 using Functions.Worker.ContextAccessor;
 using Microsoft.Extensions.Hosting;
 
@@ -45,17 +46,15 @@ namespace Finance.Bot.Telegram
                 new AzureTableEntityRepository<StateEntity>(GetSetting(AzureStorageConnectionString), TelegramAppName));
 
             services
-                .AddScoped<IMessageProcessor, StatefulMessageProcessor>()
+                .AddScoped<IMessageProcessor, StateManagingMessageProcessor>()
                 .AddAutoMapper(typeof(BotBusinessDefaultMappingProfile))
                 .AddScoped<IFactory<IStateService, string>, StateServiceFactory>(c =>
-                    new StateServiceFactory(c.GetRequiredService<IServiceProvider>(),
-                        typeof(TelegramStartedMessageProcessor)))
-                .AddScoped<IFactory<IStatefulMessageProcessor, Type>,
-                    ServiceProviderFactory<IStatefulMessageProcessor>>()
-                .AddScoped<SignedInMessageProcessor>()
-                .AddScoped<AccountSelectingMessageProcessor>()
-                .AddScoped<AccountSelectedMessageProcessor>()
-                .AddScoped<AccountCreatingMessageProcessor>();
+                    new StateServiceFactory(c.GetRequiredService<IServiceProvider>()))
+                .AddScoped<IFactory<IBotCommand, string>, BotCommandFactory>()
+                .AddScoped<CreateAccount>()
+                .AddScoped<Help>()
+                .AddScoped<SelectAccount>()
+                .AddScoped<Start>(TelegramStart);
 
             services
                 .AddFunctionContextAccessor()
@@ -66,13 +65,24 @@ namespace Finance.Bot.Telegram
                 .AddScoped<IFactory<IUpdateService, Update>, UpdateServiceFactory>()
                 .AddScoped<MessageUpdateService>()
                 .AddScoped<CallbackQueryUpdateService>()
-                .AddScoped<TelegramStartedMessageProcessor>();
+                .AddScoped<IBotMessageSender, TelegramBotMessageSender>();
         }
 
         private static string GetSetting(string key)
         {
             return Environment.GetEnvironmentVariable(key, EnvironmentVariableTarget.Process) ??
                    throw new InvalidOperationException($"Environment variable \"{key}\" is missing.");
+        }
+
+        private static Start TelegramStart(IServiceProvider serviceProvider)
+        {
+            var userService = serviceProvider.GetRequiredService<IUserService>();
+            var userLoginService = serviceProvider.GetRequiredService<IUserLoginService>();
+            var botMessageSender = serviceProvider.GetRequiredService<IBotMessageSender>();
+            User telegramUser = serviceProvider.GetRequiredService<IUpdateProvider>().Update.GetUser();
+
+            return new Start(userService, userLoginService, botMessageSender, telegramUser.FirstName,
+                telegramUser.Id.ToString(), TelegramAppName);
         }
     }
 }

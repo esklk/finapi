@@ -1,11 +1,11 @@
-﻿namespace Finance.Bot.Business
+﻿namespace Finance.Bot.Business.Constants
 {
-    public static class Commands
+    public static class CommandNames
     {
         public const string CreateAccount = "/createAccount";
-        public const string ManageAccounts = "/manageAccounts";
         public const string SelectAccount = "/selectAccount";
+        public const string Start = "/start";
         public const string Help = "/help";
-        
+
     }
 }

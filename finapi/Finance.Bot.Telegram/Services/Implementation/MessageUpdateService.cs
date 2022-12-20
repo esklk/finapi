@@ -1,6 +1,4 @@
-﻿using Finance.Bot.Business.Models;
-using Finance.Bot.Business.Services;
-using Telegram.Bot;
+﻿using Finance.Bot.Business.Services;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -9,12 +7,10 @@ namespace Finance.Bot.Telegram.Services.Implementation
     internal class MessageUpdateService : IUpdateService
     {
         private readonly IMessageProcessor _messageProcessor;
-        private readonly ITelegramBotClient _botClient;
 
-        public MessageUpdateService(IMessageProcessor messageProcessor, ITelegramBotClient botClient)
+        public MessageUpdateService(IMessageProcessor messageProcessor)
         {
             _messageProcessor = messageProcessor ?? throw new ArgumentNullException(nameof(messageProcessor));
-            _botClient = botClient ?? throw new ArgumentNullException(nameof(botClient));
         }
 
         public async Task HandleAsync(Update update)
@@ -24,12 +20,7 @@ namespace Finance.Bot.Telegram.Services.Implementation
                 throw new ArgumentException($"UpdateHandling type should be ${UpdateType.Message}", nameof(update));
             }
 
-            MessageResponse response = await _messageProcessor.ProcessAsync(update.Message?.Text);
-
-            await _botClient.SendTextMessageAsync(
-                chatId: update.GetChat().Id,
-                text: response.Text ?? string.Empty,
-                replyMarkup: response.BuildReplyMarkup());
+            await _messageProcessor.ProcessAsync(update.Message?.Text);
         }
     }
 }

@@ -1,7 +1,6 @@
 using AutoMapper;
 using Finance.Bot.Business.Mapping;
 using Finance.Bot.Business.Models;
-using Finance.Bot.Business.Services.Implementation.Stateful;
 using Finance.Bot.Data.Models;
 using Newtonsoft.Json;
 
@@ -28,13 +27,10 @@ namespace Finance.Bot.Business.Tests.Mapping
                 ChatId = 9223372036854775,
                 DataDictionary = JsonConvert.SerializeObject(new Dictionary<string, string> { { "UserId", "123" } }),
                 Timestamp = DateTimeOffset.Now,
-                Type = typeof(SignedInMessageProcessor).AssemblyQualifiedName
             };
 
             State? result = mapper.Map<State>(source);
-
-            Assert.That(result.ProcessorType, Is.Not.Null);
-            Assert.That(result.ProcessorType.AssemblyQualifiedName, Is.EqualTo(source.Type));
+            
             Assert.That(result.Data, Is.Not.Null);
             Assert.That(result.Data, Is.Empty);
 

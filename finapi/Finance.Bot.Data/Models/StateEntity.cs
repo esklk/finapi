@@ -22,6 +22,5 @@ namespace Finance.Bot.Data.Models
         public string PartitionKey { get; set; } = string.Empty;
         public string RowKey { get; set; } = "0";
         public DateTimeOffset? Timestamp { get; set; }
-        public string? Type { get; set; }
     }
 }
