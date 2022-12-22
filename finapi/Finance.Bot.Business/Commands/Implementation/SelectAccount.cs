@@ -7,32 +7,37 @@ using Finance.Business.Services;
 
 namespace Finance.Bot.Business.Commands.Implementation
 {
-    public class SelectAccount : IBotCommand
+    public class SelectAccount : ArgumentedCommand
     {
         private readonly IAccountService _accountService;
         private readonly IBotMessageSender _messageSender;
 
-        public SelectAccount(IAccountService accountService, IBotMessageSender messageSender)
+        public SelectAccount(IAccountService accountService,
+            IBotMessageSender messageSender,
+            IArgumentProviderBuilder argumentProviderBuilder) : base(1, argumentProviderBuilder)
         {
             _accountService = accountService ?? throw new ArgumentNullException(nameof(accountService));
             _messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
         }
 
-        public async Task ExecuteAsync(State state, string[] arguments)
+        protected override async Task ExecuteInternalAsync()
         {
-            if (!state.TryGetNumber(StateKeys.UserId, out int userId))
+            if (!State.TryGetNumber(StateKeys.UserId, out int userId))
             {
                 throw new MissingStateKeyException(StateKeys.UserId);
             }
 
             AccountModel[] accounts = await _accountService.GetAccountsAsync(userId);
-            if (arguments.Any() && int.TryParse(arguments[0], out int accountId) &&
-                accounts.Any(x => x.Id == accountId))
+            if (ArgumentProvider.TryGetNumber(0, out int accountId) && accounts.Any(x => x.Id == accountId))
             {
-                state[StateKeys.SelectedAccountId] = accountId;
-                await _messageSender.SendAsync(new BotMessage("Account selected."));
+                AccountModel account = accounts.First(x => x.Id == accountId);
+                State[StateKeys.SelectedAccountId] = accountId;
+                State[StateKeys.CommandAwaitingArguments] = null;
+                await _messageSender.SendAsync(new BotMessage($"Account \"{account.Name}\" selected."));
                 return;
             }
+
+            State[StateKeys.CommandAwaitingArguments] = CommandNames.SelectAccount;
 
             KeyValuePair<string, string>[] responseOptions = accounts
                 .Select(x => new KeyValuePair<string, string>(x.Name, x.Id.ToString()))

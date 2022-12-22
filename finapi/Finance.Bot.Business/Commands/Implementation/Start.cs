@@ -50,7 +50,7 @@ namespace Finance.Bot.Business.Commands.Implementation
 
         public async Task ExecuteAsync(State state, string[] arguments)
         {
-            state.Data.Clear();
+            state.Clear();
 
             UserLoginModel? userLogin = await _userLoginService.GetUserLoginAsync(_loginProvider, _loginIdentifier);
             if (userLogin == null)

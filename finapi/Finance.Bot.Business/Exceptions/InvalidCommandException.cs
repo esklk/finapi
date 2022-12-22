@@ -2,7 +2,7 @@
 {
     public class InvalidCommandException : ArgumentException
     {
-        public InvalidCommandException(string? command):base($"The command \"{command}\" is invalid for current state.")
+        public InvalidCommandException(string? command):base($"The command \"{command}\" is invalid.")
         {
             Command = command;
         }

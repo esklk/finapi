@@ -9,12 +9,8 @@ namespace Finance.Bot.Business.Mapping
     {
         public DefaultMappingProfile()
         {
-            CreateMap<string, Dictionary<string, string>>().ConvertUsing<JsonDictionaryConverter>();
-            CreateMap<Dictionary<string, string>, string>().ConvertUsing<JsonDictionaryConverter>();
-
-            CreateMap<StateEntity, State>()
-                .ForMember(d => d.Data, m => m.MapFrom(s => s.DataDictionary))
-                .ReverseMap();
+            CreateMap<StateEntity, State>().ConvertUsing<StateEntityStateConverter>();
+            CreateMap<State, StateEntity>().ConvertUsing<StateEntityStateConverter>();
         }
     }
 }

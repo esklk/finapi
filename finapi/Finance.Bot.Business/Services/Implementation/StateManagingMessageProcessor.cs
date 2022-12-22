@@ -32,6 +32,7 @@ namespace Finance.Bot.Business.Services.Implementation
                 return;
             }
 
+
             await _commandFactory.Create(command).ExecuteAsync(state, arguments);
 
             await _stateService.SetStateAsync(state);
@@ -52,7 +53,7 @@ namespace Finance.Bot.Business.Services.Implementation
                     ? text.IndexOf(CommandNameArgumentsSeparator)
                     : text.Length;
 
-                state.Data.Remove(StateKeys.AwaitingArguments);
+                state[StateKeys.CommandAwaitingArguments] = null;
                 command = text.Substring(0, commandNameLength);
                 arguments = text.Length > commandNameLength
                     ? text.Remove(0, commandNameLength).Split(ArgumentsSeparator)
@@ -60,9 +61,9 @@ namespace Finance.Bot.Business.Services.Implementation
                 return true;
             }
 
-            if (state.TryGetValue(StateKeys.AwaitingArguments, out command))
+            if (state.TryGetString(StateKeys.CommandAwaitingArguments, out command))
             {
-                arguments = text.Split(ArgumentsSeparator);
+                arguments = new[] { text };
                 return true;
             }
 

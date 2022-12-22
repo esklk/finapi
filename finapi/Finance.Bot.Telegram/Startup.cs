@@ -19,6 +19,7 @@ using Finance.Bot.Telegram.Services.Implementation;
 using Telegram.Bot.Types;
 using Functions.Worker.ContextAccessor;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Finance.Bot.Telegram
 {
@@ -30,14 +31,15 @@ namespace Finance.Bot.Telegram
 
         public static void Configure(HostBuilderContext builderContext, IServiceCollection services)
         {
-            services.AddDbContext<FinApiDbContext>(x =>
-                x.UseSqlServer(
+            services.AddDbContext<FinApiDbContext>(opt =>
+                opt.UseSqlServer(
                     GetSetting(FinApiMySqlDesignTimeDbContextFactory.FinapiDatabaseConnectionStringEnvVarName),
                     options => options.EnableRetryOnFailure()));
 
             services
                 .AddAutoMapper(typeof(BusinessDefaultMappingProfile))
                 .AddScoped<IAccountService, AccountService>()
+                .AddScoped<IOperationCategoryService, OperationCategoryService>()
                 .AddScoped<IUserLoginService, UserLoginService>()
                 .AddScoped<IUserService, UserService>();
 
@@ -46,16 +48,19 @@ namespace Finance.Bot.Telegram
                 new AzureTableEntityRepository<StateEntity>(GetSetting(AzureStorageConnectionString), TelegramAppName));
 
             services
-                .AddScoped<IMessageProcessor, StateManagingMessageProcessor>()
+                .AddScoped<StateManagingMessageProcessor>()
+                .AddScoped<IMessageProcessor>(MessageProcessorFactory)
                 .AddAutoMapper(typeof(BotBusinessDefaultMappingProfile))
                 .AddScoped<IFactory<IStateService, string>, StateServiceFactory>(c =>
                     new StateServiceFactory(c.GetRequiredService<IServiceProvider>()))
                 .AddScoped<IFactory<IBotCommand, string>, BotCommandFactory>()
+                .AddScoped<IArgumentProviderBuilder, CommandArgumentProviderBuilder>()
                 .AddScoped<CreateAccount>()
+                .AddScoped<CreateOperationCategory>()
                 .AddScoped<DeleteAccount>()
                 .AddScoped<Help>()
                 .AddScoped<SelectAccount>()
-                .AddScoped<Start>(TelegramStart);
+                .AddScoped<Start>(TelegramStartFactory);
 
             services
                 .AddFunctionContextAccessor()
@@ -75,7 +80,7 @@ namespace Finance.Bot.Telegram
                    throw new InvalidOperationException($"Environment variable \"{key}\" is missing.");
         }
 
-        private static Start TelegramStart(IServiceProvider serviceProvider)
+        private static Start TelegramStartFactory(IServiceProvider serviceProvider)
         {
             var userService = serviceProvider.GetRequiredService<IUserService>();
             var userLoginService = serviceProvider.GetRequiredService<IUserLoginService>();
@@ -84,6 +89,15 @@ namespace Finance.Bot.Telegram
 
             return new Start(userService, userLoginService, botMessageSender, telegramUser.FirstName,
                 telegramUser.Id.ToString(), TelegramAppName);
+        }
+
+        private static IMessageProcessor MessageProcessorFactory(IServiceProvider serviceProvider)
+        {
+            var messageProcessor = serviceProvider.GetRequiredService<StateManagingMessageProcessor>();
+            var messageSender = serviceProvider.GetRequiredService<IBotMessageSender>();
+            var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+
+            return new ErrorHandlingMessageProcessor(messageProcessor, messageSender, loggerFactory);
         }
     }
 }

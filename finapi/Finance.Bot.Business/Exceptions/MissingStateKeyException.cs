@@ -1,6 +1,6 @@
 ﻿namespace Finance.Bot.Business.Exceptions
 {
-    public class MissingStateKeyException : Exception
+    public class MissingStateKeyException : CommandExecutionException
     {
         public string Key { get; }
 
