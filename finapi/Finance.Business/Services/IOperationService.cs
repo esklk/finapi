@@ -9,6 +9,6 @@ namespace Finance.Business.Services
     {
         Task<T[]> QueryOperations<T>(int accountId, Func<IQueryable<OperationModel>, IQueryable<T>> queryAction);
 
-        Task<OperationModel> CreateOperation(int authorId, int accountId, int categoryId, double ammount, DateTime? madeAt = null);
+        Task<OperationModel> CreateOperation(int authorId, int accountId, int categoryId, double amount, DateTime? madeAt = null);
     }
 }

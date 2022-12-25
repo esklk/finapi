@@ -22,6 +22,7 @@ namespace Finance.Bot.Business.Services.Implementation
             CommandNames.CreateOperationCategory => _serviceProvider.GetRequiredService<CreateOperationCategory>(),
             CommandNames.DeleteAccount => _serviceProvider.GetRequiredService<DeleteAccount>(),
             CommandNames.Help => _serviceProvider.GetRequiredService<Help>(),
+            CommandNames.ReportOperation => _serviceProvider.GetRequiredService<ReportOperation>(),
             CommandNames.SelectAccount => _serviceProvider.GetRequiredService<SelectAccount>(),
             CommandNames.Start => _serviceProvider.GetRequiredService<Start>(),
             _ => throw new InvalidCommandException(commandName)

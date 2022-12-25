@@ -34,7 +34,7 @@ namespace Finance.Bot.Business.Services.Implementation
             return TryGetArgumentWithCleanup(index, out value);
         }
 
-        public bool TryGetNumber(int index, out int value)
+        public bool TryGetInteger(int index, out int value)
         {
             return TryGetArgumentWithCleanup(index, out value);
         }
@@ -44,6 +44,19 @@ namespace Finance.Bot.Business.Services.Implementation
             return TryGetArgumentWithCleanup(index, out value);
         }
 
+        public bool TryGetDouble(int index, out double value)
+        {
+            return TryGetArgumentWithCleanup(index, out value);
+        }
+
+        public bool TryGetDateTime(int index, out DateTime value)
+        {
+            return TryGetArgumentWithCleanup(index, out value);
+
+        }
+
+        private string AwaitedArgumentNameStateKey => $"{_stateKeyPrefix}_AwaitedArgumentName";
+
         private bool TryGetArgumentWithCleanup<T>(int index, [MaybeNullWhen(false)] out T value)
         {
             if (!TryGetArgument(index, out value))
@@ -51,50 +64,55 @@ namespace Finance.Bot.Business.Services.Implementation
                 return false;
             }
 
+            CleanupIfNeeded(index);
+            return true;
+        }
+
+        private void CleanupIfNeeded(int index)
+        {
             if (index != _lastArgumentIndex)
             {
-                return true;
+                return;
             }
 
             // Remove saved parameters when the last parameter acquired successfully
-            foreach (string key in _state.Keys.Where(x=>x.StartsWith(_stateKeyPrefix)))
+            foreach (string key in _state.Keys.Where(x => x.StartsWith(_stateKeyPrefix)))
             {
                 _state[key] = null;
             }
-
-            return true;
         }
 
         private bool TryGetArgument<T>(int index, [MaybeNullWhen(false)] out T value)
         {
-            string stateKey = $"{_stateKeyPrefix}_arg_{index}";
+            string requestedArgumentName = $"{_stateKeyPrefix}_arg_{index}";
 
-            // When missing parameters requested
-            // 1. Try get from state -> might be set during previous requests
-            // 2. Try get from arguments at 0 position
-            if (_state.ContainsKey(StateKeys.CommandAwaitingArguments))
+            // 1. Try get from 0 position for the case if awaited
+            if (_state.TryGetString(AwaitedArgumentNameStateKey, out string? awaitedArgumentName)
+                && awaitedArgumentName == requestedArgumentName
+                && TryGetFromArguments(0, out value))
             {
-                // Skip for last argument, because last parameter always acquired from arguments
-                if (index < _lastArgumentIndex && TryGetFromState(stateKey, out value))
-                {
-                    return true;
-                }
-
-                // Requested one by one parameters always come as the first argument
-                if (TryGetFromArguments(0, out value))
-                {
-                    _state[stateKey] = value;
-                    return true;
-                }
-            }
-            // When command came along with parameters
-            // Try get from arguments at its expected position
-            else if (TryGetFromArguments(index, out value))
-            {
-                _state[stateKey] = value;
+                _state[AwaitedArgumentNameStateKey] = null;
+                _state[requestedArgumentName] = value;
                 return true;
             }
 
+            // 2. Try get from state for the case it was provided with previous requests, but not with the current one
+            // last argument will never be state since state is cleaned up after last argument successfully received
+            if (index < _lastArgumentIndex && TryGetFromState(requestedArgumentName, out value))
+            {
+                return true;
+            }
+
+            // 3. Try get from expected position for the case arguments are passed along with command
+            if (TryGetFromArguments(index, out value))
+            {
+                _state[requestedArgumentName] = value;
+                return true;
+            }
+
+            _state[AwaitedArgumentNameStateKey] = requestedArgumentName;
+
+            value = default;
             return false;
         }
 

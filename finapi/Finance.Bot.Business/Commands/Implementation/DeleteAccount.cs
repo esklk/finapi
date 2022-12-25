@@ -29,7 +29,7 @@ namespace Finance.Bot.Business.Commands.Implementation
 
             AccountModel[] accounts = await _accountService.GetAccountsAsync(userId);
 
-            if (!ArgumentProvider.TryGetNumber(0, out int accountId) || accounts.All(x => x.Id != accountId))
+            if (!ArgumentProvider.TryGetInteger(0, out int accountId) || accounts.All(x => x.Id != accountId))
             {
                 State[StateKeys.CommandAwaitingArguments] = CommandNames.DeleteAccount;
 

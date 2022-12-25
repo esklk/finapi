@@ -20,7 +20,7 @@ namespace Finance.Business.Services.Implementation
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<OperationModel> CreateOperation(int authorId, int accountId, int categoryId, double ammount, DateTime? madeAt = null)
+        public async Task<OperationModel> CreateOperation(int authorId, int accountId, int categoryId, double amount, DateTime? madeAt = null)
         {
             if (!madeAt.HasValue)
             {
@@ -30,7 +30,7 @@ namespace Finance.Business.Services.Implementation
             var operation = new Operation
             {
                 AccountId = accountId,
-                Ammount = ammount,
+                Ammount = amount,
                 AuthorId = authorId,
                 CategoryId = categoryId,
                 CreatedOn = madeAt.Value

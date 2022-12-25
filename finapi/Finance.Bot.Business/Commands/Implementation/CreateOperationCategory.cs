@@ -29,20 +29,20 @@ namespace Finance.Bot.Business.Commands.Implementation
                 return;
             }
 
-            if (!ArgumentProvider.TryGetString(0, out string? name))
-            {
-                State[StateKeys.CommandAwaitingArguments] = CommandNames.CreateOperationCategory;
-                await _messageSender.SendAsync(new BotMessage("Please enter an operation category name"));
-                return;
-            }
-
-            if (!ArgumentProvider.TryGetBool(1, out bool isIncome))
+            if (!ArgumentProvider.TryGetBool(0, out bool isIncome))
             {
                 State[StateKeys.CommandAwaitingArguments] = CommandNames.CreateOperationCategory;
                 await _messageSender.SendAsync(new BotMessage(
                     "Is it income category?",
                     new KeyValuePair<string, string>("Yes", "true"),
                     new KeyValuePair<string, string>("No", "false")));
+                return;
+            }
+
+            if (!ArgumentProvider.TryGetString(1, out string? name))
+            {
+                State[StateKeys.CommandAwaitingArguments] = CommandNames.CreateOperationCategory;
+                await _messageSender.SendAsync(new BotMessage("Please enter an operation category name"));
                 return;
             }
 

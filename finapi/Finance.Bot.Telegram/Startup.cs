@@ -40,6 +40,7 @@ namespace Finance.Bot.Telegram
                 .AddAutoMapper(typeof(BusinessDefaultMappingProfile))
                 .AddScoped<IAccountService, AccountService>()
                 .AddScoped<IOperationCategoryService, OperationCategoryService>()
+                .AddScoped<IOperationService, OperationService>()
                 .AddScoped<IUserLoginService, UserLoginService>()
                 .AddScoped<IUserService, UserService>();
 
@@ -59,6 +60,7 @@ namespace Finance.Bot.Telegram
                 .AddScoped<CreateOperationCategory>()
                 .AddScoped<DeleteAccount>()
                 .AddScoped<Help>()
+                .AddScoped<ReportOperation>()
                 .AddScoped<SelectAccount>()
                 .AddScoped<Start>(TelegramStartFactory);
 

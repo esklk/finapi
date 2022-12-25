@@ -29,6 +29,8 @@ namespace Finance.Bot.Telegram.Services.Implementation
 
                 _defaultReplyMarkup = new ReplyKeyboardMarkup(new[]
                 {
+                    // operations
+                    new KeyboardButton[] { CommandNames.ReportOperation},
                     // operation categories
                     new KeyboardButton[] { CommandNames.CreateOperationCategory},
                     // account
@@ -64,8 +66,9 @@ namespace Finance.Bot.Telegram.Services.Implementation
 
             if (response.TaggedOptions.Any())
             {
-                return new InlineKeyboardMarkup(new[]
-                    { response.TaggedOptions.Select(x => InlineKeyboardButton.WithCallbackData(x.Key, x.Value)) });
+                return new InlineKeyboardMarkup(response.TaggedOptions
+                    .Select(x => InlineKeyboardButton.WithCallbackData(x.Key, x.Value))
+                    .Chunk(2));
             }
 
             return DefaultReplyMarkup;

@@ -28,7 +28,7 @@ namespace Finance.Bot.Business.Commands.Implementation
             }
 
             AccountModel[] accounts = await _accountService.GetAccountsAsync(userId);
-            if (ArgumentProvider.TryGetNumber(0, out int accountId) && accounts.Any(x => x.Id == accountId))
+            if (ArgumentProvider.TryGetInteger(0, out int accountId) && accounts.Any(x => x.Id == accountId))
             {
                 AccountModel account = accounts.First(x => x.Id == accountId);
                 State[StateKeys.SelectedAccountId] = accountId;
