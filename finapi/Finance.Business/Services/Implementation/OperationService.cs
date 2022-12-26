@@ -51,7 +51,7 @@ namespace Finance.Business.Services.Implementation
 
         }
 
-        public async Task<T[]> QueryOperations<T>(int accountId, Func<IQueryable<OperationModel>, IQueryable<T>> queryAction)
+        public async Task<T[]> GetOperationsAsync<T>(int accountId, Func<IQueryable<OperationExpandedModel>, IQueryable<T>> queryAction)
         {
             if(queryAction == null)
             {
@@ -60,7 +60,7 @@ namespace Finance.Business.Services.Implementation
 
             var query = _context.Operations.Where(x => x.AccountId == accountId);
 
-            var resultQuery = queryAction(_mapper.ProjectTo<OperationModel>(query));
+            var resultQuery = queryAction(_mapper.ProjectTo<OperationExpandedModel>(query));
 
             return await resultQuery.ToArrayAsync();
         }

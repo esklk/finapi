@@ -30,7 +30,7 @@ namespace Finance.Bot.Telegram.Services.Implementation
                 _defaultReplyMarkup = new ReplyKeyboardMarkup(new[]
                 {
                     // operations
-                    new KeyboardButton[] { CommandNames.ReportOperation},
+                    new KeyboardButton[] { CommandNames.ReportOperation, CommandNames.GetOperationsReport},
                     // operation categories
                     new KeyboardButton[] { CommandNames.CreateOperationCategory},
                     // account

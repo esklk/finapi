@@ -21,6 +21,7 @@ namespace Finance.Bot.Business.Services.Implementation
             CommandNames.CreateAccount => _serviceProvider.GetRequiredService<CreateAccount>(),
             CommandNames.CreateOperationCategory => _serviceProvider.GetRequiredService<CreateOperationCategory>(),
             CommandNames.DeleteAccount => _serviceProvider.GetRequiredService<DeleteAccount>(),
+            CommandNames.GetOperationsReport => _serviceProvider.GetRequiredService<GetOperationsReport>(),
             CommandNames.Help => _serviceProvider.GetRequiredService<Help>(),
             CommandNames.ReportOperation => _serviceProvider.GetRequiredService<ReportOperation>(),
             CommandNames.SelectAccount => _serviceProvider.GetRequiredService<SelectAccount>(),

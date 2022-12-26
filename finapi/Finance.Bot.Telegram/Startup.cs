@@ -59,6 +59,7 @@ namespace Finance.Bot.Telegram
                 .AddScoped<CreateAccount>()
                 .AddScoped<CreateOperationCategory>()
                 .AddScoped<DeleteAccount>()
+                .AddScoped<GetOperationsReport>()
                 .AddScoped<Help>()
                 .AddScoped<ReportOperation>()
                 .AddScoped<SelectAccount>()
