@@ -31,8 +31,15 @@ namespace Finance.Bot.Business.Commands.Implementation
 
             if(!ArgumentProvider.TryGetDateTime(0, out DateTime from))
             {
+                var now = DateTime.UtcNow;
+                var startOfCurrentMonth = new DateTime(now.Year, now.Month, 1);
                 State[StateKeys.CommandAwaitingArguments] = CommandNames.GetOperationsReport;
-                await _messageSender.SendAsync(new BotMessage("Starting from what date you want the report to contain operations?"));
+                await _messageSender.SendAsync(new BotMessage(
+                    "Starting from what date you want the report to contain operations?",
+                    new KeyValuePair<string, string>("Start of current month",
+                        startOfCurrentMonth.ToString("yyyy-MM-dd")),
+                    new KeyValuePair<string, string>("Start of last month",
+                        startOfCurrentMonth.AddMonths(-1).ToString("yyyy-MM-dd"))));
                 return;
             }
 
@@ -40,7 +47,8 @@ namespace Finance.Bot.Business.Commands.Implementation
             {
                 State[StateKeys.CommandAwaitingArguments] = CommandNames.GetOperationsReport;
                 await _messageSender.SendAsync(new BotMessage(
-                    $"In the report you want to see operation from {from:MMM dd, YYYY} to what date?"));
+                    $"In the report you want to see operation from {from:MMM dd, yyyy} to what date?",
+                    new KeyValuePair<string, string>("Today", DateTime.UtcNow.ToString("yyyy-MM-dd"))));
                 return;
             }
 
@@ -56,7 +64,7 @@ namespace Finance.Bot.Business.Commands.Implementation
                 .OrderByDescending(x => x.Total));
 
             var messageTextBuilder = new StringBuilder()
-                .AppendFormat("Please see your operations report between {0:MMM dd, YYYY} and {1:MMM dd, YYYY}:", from, to)
+                .AppendFormat("Please see your operations report between {0:MMM dd, yyyy} and {1:MMM dd, yyyy}:", from, to)
                 .AppendLine()
                 .AppendFormat("Balance: {0}", operations.Sum(x => x.Total))
                 .AppendLine()
