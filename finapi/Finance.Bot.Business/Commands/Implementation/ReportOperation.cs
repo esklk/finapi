@@ -16,7 +16,7 @@ namespace Finance.Bot.Business.Commands.Implementation
         public ReportOperation(IOperationService operationService, 
             IOperationCategoryService operationCategoryService, 
             IBotMessageSender messageSender, 
-            IArgumentProviderBuilder argumentProviderBuilder) : base(4, argumentProviderBuilder)
+            IArgumentProviderBuilder argumentProviderBuilder) : base(3, argumentProviderBuilder)
         {
             _operationService = operationService ?? throw new ArgumentNullException(nameof(operationService));
             _operationCategoryService = operationCategoryService ?? throw new ArgumentNullException(nameof(operationCategoryService));
@@ -37,50 +37,39 @@ namespace Finance.Bot.Business.Commands.Implementation
                 return;
             }
 
-            if (!ArgumentProvider.TryGetDouble(0, out double amount))
+            OperationCategoryModel? selectedCategory = await GetOperationCategory(selectedAccountId);
+            if (selectedCategory == null)
             {
                 State[StateKeys.CommandAwaitingArguments] = CommandNames.ReportOperation;
-                await _messageSender.SendAsync(new BotMessage("Please enter amount"));
-                return;
-            }
+                string messageText = "What is category of your expense?";
 
-            if (!ArgumentProvider.TryGetBool(1, out bool isIncome))
-            {
-                State[StateKeys.CommandAwaitingArguments] = CommandNames.ReportOperation;
-                await _messageSender.SendAsync(new BotMessage(
-                    "Is it income?",
-                    new KeyValuePair<string, string>("Yes", "true"),
-                    new KeyValuePair<string, string>("No", "false")));
-                return;
-            }
+                OperationCategoryModel[] operationCategories =
+                    await _operationCategoryService.GetCategoriesAsync(selectedAccountId);
 
-            OperationCategoryModel[] operationCategories =
-                await _operationCategoryService.GetCategoriesAsync(selectedAccountId);
-            if (!ArgumentProvider.TryGetInteger(2, out int categoryId) 
-                || operationCategories.All(x => x.Id != categoryId))
-            {
-                State[StateKeys.CommandAwaitingArguments] = CommandNames.ReportOperation;
-                string messageText = isIncome
-                    ? $"What is the source of your {amount} income?"
-                    : $"What you spent your {amount} on?";
-
-                KeyValuePair<string, string>[] categories = operationCategories.Where(x => x.IsIncome == isIncome)
+                KeyValuePair<string, string>[] categories = operationCategories
                     .Select(x => new KeyValuePair<string, string>(x.Name, x.Id.ToString()))
-                    .Append(new KeyValuePair<string, string>($"New {(isIncome ? "income" : "expense")} category",
-                        $"{CommandNames.CreateOperationCategory} {isIncome}"))
+                    .Append(new KeyValuePair<string, string>("New category",
+                        $"{CommandNames.CreateOperationCategory}"))
                     .ToArray();
 
                 await _messageSender.SendAsync(new BotMessage(messageText, categories));
                 return;
             }
 
-            if (!ArgumentProvider.TryGetDateTime(3, out DateTime madeAt))
+
+            if (!ArgumentProvider.TryGetDouble(1, out double amount))
             {
                 State[StateKeys.CommandAwaitingArguments] = CommandNames.ReportOperation;
-                var categoryName = operationCategories.First(x => x.Id == categoryId).Name;
-                string messageText = isIncome
-                    ? $"When did you get {amount} as {categoryName}?"
-                    : $"When did you spend {amount} for {categoryName}?";
+                await _messageSender.SendAsync(new BotMessage("Please enter amount"));
+                return;
+            }
+
+            if (!ArgumentProvider.TryGetDateTime(2, out DateTime madeAt))
+            {
+                State[StateKeys.CommandAwaitingArguments] = CommandNames.ReportOperation;
+                string messageText = selectedCategory.IsIncome
+                    ? $"When did you get {amount} as {selectedCategory.Name}?"
+                    : $"When did you spend {amount} for {selectedCategory.Name}?";
                 await _messageSender.SendAsync(new BotMessage(messageText,
                     new KeyValuePair<string, string>("Now", DateTime.UtcNow.ToString("O"))));
                 return;
@@ -90,20 +79,29 @@ namespace Finance.Bot.Business.Commands.Implementation
 
             try
             {
-                await _operationService.CreateOperation(userId, selectedAccountId, categoryId, amount, madeAt);
+                await _operationService.CreateOperation(userId, selectedAccountId, selectedCategory.Id, amount, madeAt);
             }
             catch (Exception ex)
             {
                 throw new CommandExecutionException(ex, "Failed to report an operation.",
-                    $"{CommandNames.ReportOperation} {amount},{isIncome},{categoryId},{madeAt:O}");
+                    $"{CommandNames.ReportOperation} {selectedCategory.Id},{amount},{madeAt:O}");
             }
 
-            await _messageSender.SendAsync(new BotMessage(
-                string.Format("Reported {0} of {1} {2} {3}.", 
-                    isIncome ? "gaining" : "spending", 
-                    amount, 
-                    isIncome ? "as" : "for", 
-                    operationCategories.First(x => x.Id == categoryId).Name)));
+            BotMessage message = new BotMessage(
+                $"Reported {(selectedCategory.IsIncome ? "gaining" : "spending")} of {amount} {(selectedCategory.IsIncome ? "as" : "for")} {selectedCategory.Name}.",
+                new KeyValuePair<string, string>(
+                    $"Report more {(selectedCategory.IsIncome ? "income" : "expenses")} to {selectedCategory.Name}",
+                    $"{CommandNames.ReportOperation} {selectedCategory.Id}")
+            );
+
+            await _messageSender.SendAsync(message);
+        }
+
+        private async Task<OperationCategoryModel?> GetOperationCategory(int accountId)
+        {
+            return ArgumentProvider.TryGetInteger(0, out int categoryId)
+                ? await _operationCategoryService.GetCategoryAsync(categoryId)
+                : null;
         }
     }
 }

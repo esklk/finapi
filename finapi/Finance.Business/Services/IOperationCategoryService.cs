@@ -8,5 +8,6 @@ namespace Finance.Business.Services
         Task<OperationCategoryModel> CreateCategoryAsync(string name, bool isIncome, int accountId);
         Task DeleteCategoryAsync(int id);
         Task<OperationCategoryModel[]> GetCategoriesAsync(int accountId);
+        Task<OperationCategoryModel?> GetCategoryAsync(int id);
     }
 }

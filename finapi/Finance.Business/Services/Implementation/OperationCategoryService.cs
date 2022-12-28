@@ -27,6 +27,13 @@ namespace Finance.Business.Services.Implementation
             return await _mapper.ProjectTo<OperationCategoryModel>(query).ToArrayAsync();
         }
 
+        public async Task<OperationCategoryModel?> GetCategoryAsync(int id)
+        {
+            var category = await _context.OperationCategories.FindAsync(id);
+
+            return _mapper.Map<OperationCategoryModel>(category);
+        }
+
         public async Task<OperationCategoryModel> CreateCategoryAsync(string name, bool isIncome, int accountId)
         {
             var category = new OperationCategory
