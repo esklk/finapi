@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using Finance.Bot.Business.Constants;
+﻿using Finance.Bot.Business.Constants;
 using Finance.Bot.Business.Models;
 using Finance.Bot.Business.Services;
 using Finance.Business.Services;
@@ -54,7 +53,7 @@ namespace Finance.Bot.Business.Commands.Implementation
 
             var operations = await _operationService
                 .GetOperationsAsync(accountId, q => q
-                .Where(o => o.CreatedOn > from.Date && o.CreatedOn < to.Date.AddDays(1))
+                .Where(o => o.CreatedOn >= from.Date && o.CreatedOn <= to.Date.AddDays(1).AddSeconds(-1))
                 .GroupBy(o => new { o.Category.Name, o.Category.IsIncome })
                 .Select(g => new
                 {
