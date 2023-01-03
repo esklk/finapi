@@ -48,10 +48,9 @@ namespace Finance.Business.Services.Implementation
             {
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateException ex)
-            //when (ex?.InnerException is MySqlException mySqlEx && mySqlEx.ErrorCode == MySqlErrorCode.NoReferencedRow2)
+            catch (Exception ex)
             {
-                throw new ArgumentException("Account with given Id not found.", nameof(accountId));
+                throw new Exception("Failed to create an operation category.", ex);
             }
 
             return _mapper.Map<OperationCategoryModel>(category);
@@ -59,7 +58,7 @@ namespace Finance.Business.Services.Implementation
 
         public async Task DeleteCategoryAsync(int categoryId)
         {
-            OperationCategory category = await _context.OperationCategories.FindAsync(categoryId);
+            OperationCategory? category = await _context.OperationCategories.FindAsync(categoryId);
             if(category == null)
             {
                 throw new ArgumentException("Operation Category with given Id does not exist.", nameof(categoryId));

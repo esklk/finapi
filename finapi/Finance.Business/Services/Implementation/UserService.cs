@@ -36,7 +36,7 @@ namespace Finance.Business.Services.Implementation
             {
                 await _context.SaveChangesAsync();
             }
-            catch(DbUpdateException ex)
+            catch (DbUpdateException ex)
             {
                 throw new Exception("Failed to create a user.", ex);
             }

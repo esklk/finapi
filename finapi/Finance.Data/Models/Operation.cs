@@ -10,19 +10,19 @@ namespace Finance.Data.Models
         public int AccountId { get; set; }
 
         [ForeignKey(nameof(AccountId))]
-        public Account Account { get; set; }
+        public Account Account { get; set; } = default!;
 
         public double Ammount { get; set; }
 
         public int AuthorId { get; set; }
 
         [ForeignKey(nameof(AuthorId))]
-        public User Author { get; set; }
+        public User Author { get; set; } = default!;
 
-        public int CategoryId { get; set; }
+        public int CategoryId { get; set; } = default!;
 
         [ForeignKey(nameof(CategoryId))]
-        public OperationCategory Category { get; set; }
+        public OperationCategory Category { get; set; } = default!;
 
         public DateTime CreatedOn { get; set; }
     }

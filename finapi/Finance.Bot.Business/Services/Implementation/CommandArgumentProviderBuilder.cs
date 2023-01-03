@@ -25,7 +25,7 @@ namespace Finance.Bot.Business.Services.Implementation
 
         public IArgumentProvider Build()
         {
-            return new CommandArgumentProvider(_state, _stateKeyPrefix, _arguments, _expectedArgumentsCount);
+            return new CommandArgumentProvider(_state!, _stateKeyPrefix!, _arguments!, _expectedArgumentsCount);
         }
 
         public IArgumentProviderBuilder SetConsumerType(Type type)

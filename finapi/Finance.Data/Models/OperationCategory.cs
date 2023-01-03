@@ -9,13 +9,13 @@ namespace Finance.Data.Models
 
         public bool IsIncome { get; set; }
 
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         public int AccountId { get; set; }
 
         [ForeignKey(nameof(AccountId))]
-        public Account Account { get; set; }
+        public Account Account { get; set; } = default!;
 
-        public ICollection<Operation> Operations { get; set; }
+        public ICollection<Operation> Operations { get; set; } = default!;
     }
 }

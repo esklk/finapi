@@ -41,10 +41,9 @@ namespace Finance.Business.Services.Implementation
             {
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateException ex)
-            //when (ex?.InnerException is MySqlException mySqlEx && mySqlEx.ErrorCode == MySqlErrorCode.NoReferencedRow2)
+            catch (Exception ex)
             {
-                throw new ArgumentException("Account with given Id does not exist.", nameof(accountId));
+                throw new Exception("Failed to create an operation.", ex);
             }
 
             return _mapper.Map<OperationModel>(operation);

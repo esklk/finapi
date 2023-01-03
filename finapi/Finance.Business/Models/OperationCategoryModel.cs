@@ -6,6 +6,6 @@
 
         public bool IsIncome { get; set; }
 
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
     }
 }

@@ -61,7 +61,7 @@ namespace Finance.Bot.Business.Services.Implementation
                 return true;
             }
 
-            if (state.TryGetString(StateKeys.CommandAwaitingArguments, out command))
+            if (state.TryGetString(StateKeys.CommandAwaitingArguments, out command!))
             {
                 arguments = new[] { text };
                 return true;
