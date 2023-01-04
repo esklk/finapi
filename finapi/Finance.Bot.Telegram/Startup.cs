@@ -25,16 +25,23 @@ namespace Finance.Bot.Telegram
 {
     public static class Startup
     {
-        private const string AzureStorageConnectionString = "AzureStorageConnectionString";
+        private const string AzureStorageConnectionString = "AzureWebJobsStorage";
         private const string TelegramAppName = "Telegram";
         private const string TelegramBotToken = "TelegramBotToken";
 
         public static void Configure(HostBuilderContext builderContext, IServiceCollection services)
         {
-            services.AddDbContext<FinApiDbContext>(opt =>
-                opt.UseSqlServer(
-                    GetSetting(FinApiMySqlDesignTimeDbContextFactory.FinapiDatabaseConnectionStringEnvVarName),
-                    options => options.EnableRetryOnFailure()));
+            if (builderContext.HostingEnvironment.IsDevelopment())
+            {
+                services.AddDbContext<FinApiDbContext>(opt => opt.UseInMemoryDatabase("Finance"));
+            }
+            else
+            {
+                services.AddDbContext<FinApiDbContext>(opt =>
+                    opt.UseSqlServer(
+                        builderContext.Configuration["DatabaseConfiguration:ConnectionString"]!,
+                        options => options.EnableRetryOnFailure()));
+            }
 
             services
                 .AddAutoMapper(typeof(BusinessDefaultMappingProfile))
@@ -46,7 +53,8 @@ namespace Finance.Bot.Telegram
 
             services
                 .AddScoped<IRepository<StateEntity, string>, AzureTableEntityRepository<StateEntity>>(x =>
-                new AzureTableEntityRepository<StateEntity>(GetSetting(AzureStorageConnectionString), TelegramAppName));
+                    new AzureTableEntityRepository<StateEntity>(
+                        builderContext.Configuration[AzureStorageConnectionString]!, TelegramAppName));
 
             services
                 .AddScoped<StateManagingMessageProcessor>()
@@ -67,7 +75,7 @@ namespace Finance.Bot.Telegram
 
             services
                 .AddFunctionContextAccessor()
-                .AddSingleton<ITelegramBotClient>(new TelegramBotClient(GetSetting(TelegramBotToken)))
+                .AddSingleton<ITelegramBotClient>(new TelegramBotClient(builderContext.Configuration[TelegramBotToken]!))
                 .AddScoped<IUpdateProvider, FunctionContextUpdateProvider>()
                 .AddScoped<TelegramChatStateServiceFactory>()
                 .AddScoped<IStateService>(c => c.GetRequiredService<TelegramChatStateServiceFactory>().Create())
@@ -75,12 +83,6 @@ namespace Finance.Bot.Telegram
                 .AddScoped<MessageUpdateService>()
                 .AddScoped<CallbackQueryUpdateService>()
                 .AddScoped<IBotMessageSender, TelegramBotMessageSender>();
-        }
-
-        private static string GetSetting(string key)
-        {
-            return Environment.GetEnvironmentVariable(key, EnvironmentVariableTarget.Process) ??
-                   throw new InvalidOperationException($"Environment variable \"{key}\" is missing.");
         }
 
         private static Start TelegramStartFactory(IServiceProvider serviceProvider)
