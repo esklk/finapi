@@ -9,6 +9,8 @@ namespace Finance.Bot.Business.Commands.Implementation
 {
     public class ReportOperation : ArgumentedCommand
     {
+        private const string DateFormat = "dddd, MMMM d, yyyy";
+
         private readonly IOperationService _operationService;
         private readonly IOperationCategoryService _operationCategoryService;
         private readonly IBotMessageSender _messageSender;
@@ -41,12 +43,14 @@ namespace Finance.Bot.Business.Commands.Implementation
             if (selectedCategory == null)
             {
                 State[StateKeys.CommandAwaitingArguments] = CommandNames.ReportOperation;
-                string messageText = "What is category of your expense?";
+                string messageText = "What kind of operation you would like to report?";
 
                 OperationCategoryModel[] operationCategories =
                     await _operationCategoryService.GetCategoriesAsync(selectedAccountId);
 
                 KeyValuePair<string, string>[] categories = operationCategories
+                    .OrderBy(x=>x.IsIncome)
+                    .ThenBy(x=>x.Name)
                     .Select(x => new KeyValuePair<string, string>(x.Name, x.Id.ToString()))
                     .Append(new KeyValuePair<string, string>("New category",
                         $"{CommandNames.CreateOperationCategory}"))
@@ -70,8 +74,12 @@ namespace Finance.Bot.Business.Commands.Implementation
                 string messageText = selectedCategory.IsIncome
                     ? $"When did you get {amount} as {selectedCategory.Name}?"
                     : $"When did you spend {amount} for {selectedCategory.Name}?";
+                var today = DateTime.UtcNow.Date;
                 await _messageSender.SendAsync(new BotMessage(messageText,
-                    new KeyValuePair<string, string>("Now", DateTime.UtcNow.ToString("O"))));
+                    today.ToString(DateFormat), today.AddDays(-1).ToString(DateFormat),
+                    today.AddDays(-2).ToString(DateFormat), today.AddDays(-3).ToString(DateFormat),
+                    today.AddDays(-4).ToString(DateFormat), today.AddDays(-5).ToString(DateFormat),
+                    today.AddDays(-6).ToString(DateFormat), today.AddDays(-7).ToString(DateFormat)));
                 return;
             }
 
