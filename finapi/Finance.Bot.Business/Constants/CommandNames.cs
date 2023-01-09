@@ -2,12 +2,12 @@
 {
     public static class CommandNames
     {
-        public const string CreateAccount = "/createAccount";
-        public const string CreateOperationCategory = "/createOperationCategory";
-        public const string DeleteAccount = "/deleteAccount";
-        public const string GetOperationsReport = "/getOperationsReport";
-        public const string ReportOperation = "/reportOperation";
-        public const string SelectAccount = "/selectAccount";
+        public const string CreateAccount = "/accountcreate";
+        public const string CreateOperationCategory = "/categorycreate";
+        public const string DeleteAccount = "/accountdelete";
+        public const string GetOperationsReport = "/operationreportgenerate";
+        public const string ReportOperation = "/operationcreate";
+        public const string SelectAccount = "/accountselect";
         public const string Start = "/start";
         public const string Help = "/help";
 
