@@ -16,7 +16,7 @@ namespace Finance.Bot.Business.Commands.Implementation
             IArgumentProviderBuilder argumentProviderBuilder) : base(2, argumentProviderBuilder)
         {
             _operationService = operationService ?? throw new ArgumentNullException(nameof(operationService));
-            _messageSender = messageSender ?? throw new ArgumentNullException(nameof(operationService));
+            _messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
         }
 
         protected override async Task ExecuteInternalAsync()
