@@ -29,13 +29,14 @@ namespace Finance.Bot.Telegram.Functions
             await _botClient.SetWebhookAsync(handleUpdateFunctionUrl);
             await _botClient.SetMyCommandsAsync(new[]
             {
-                new BotCommand { Command = CommandNames.ReportOperation, Description = "Report an operation" },
-                new BotCommand { Command = CommandNames.GetOperationsReport, Description = "Get operations report" },
+                new BotCommand { Command = CommandNames.GetOperationsReport, Description = "Generate report" },
+                new BotCommand { Command = CommandNames.Cancel, Description = "Cancel the current operation" },
                 new BotCommand { Command = CommandNames.Help, Description = "Get help" },
                 new BotCommand { Command = CommandNames.SelectAccount, Description = "Select an account" },
                 new BotCommand { Command = CommandNames.CreateAccount, Description = "Create an account" },
                 new BotCommand { Command = CommandNames.DeleteAccount, Description = "Delete an account" },
                 new BotCommand { Command = CommandNames.CreateOperationCategory, Description = "Create an operation category" },
+                new BotCommand { Command = CommandNames.ReportOperation, Description = "Report an operation" },
                 new BotCommand { Command = CommandNames.Start, Description = "Restart" }
             });
             await _botClient.SetChatMenuButtonAsync(null, new MenuButtonCommands());

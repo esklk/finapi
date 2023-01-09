@@ -64,6 +64,7 @@ namespace Finance.Bot.Telegram
                     new StateServiceFactory(c.GetRequiredService<IServiceProvider>()))
                 .AddScoped<IFactory<IBotCommand, string>, BotCommandFactory>()
                 .AddScoped<IArgumentProviderBuilder, CommandArgumentProviderBuilder>()
+                .AddScoped<CancelCommand>()
                 .AddScoped<CreateAccount>()
                 .AddScoped<CreateOperationCategory>()
                 .AddScoped<DeleteAccount>()

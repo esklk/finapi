@@ -18,6 +18,7 @@ namespace Finance.Bot.Business.Services.Implementation
 
         public IBotCommand Create(string commandName) => commandName switch
         {
+            CommandNames.Cancel => _serviceProvider.GetRequiredService<CancelCommand>(),
             CommandNames.CreateAccount => _serviceProvider.GetRequiredService<CreateAccount>(),
             CommandNames.CreateOperationCategory => _serviceProvider.GetRequiredService<CreateOperationCategory>(),
             CommandNames.DeleteAccount => _serviceProvider.GetRequiredService<DeleteAccount>(),

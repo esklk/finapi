@@ -2,6 +2,7 @@
 using Finance.Bot.Business.Constants;
 using Finance.Bot.Business.Models;
 using Finance.Core.Practices;
+using static System.Double;
 
 namespace Finance.Bot.Business.Services.Implementation
 {
@@ -32,12 +33,12 @@ namespace Finance.Bot.Business.Services.Implementation
                 return;
             }
 
-
             await _commandFactory.Create(command).ExecuteAsync(state, arguments);
 
             await _stateService.SetStateAsync(state);
         }
 
+        //TODO: refactor to avoid many conditions
         private static bool TryGetCommandAndArguments(State state, string? text, out string command, out string[] arguments)
         {
             if (string.IsNullOrWhiteSpace(text))
@@ -54,7 +55,7 @@ namespace Finance.Bot.Business.Services.Implementation
                     : text.Length;
 
                 state[StateKeys.CommandAwaitingArguments] = null;
-                command = text.Substring(0, commandNameLength);
+                command = text[..commandNameLength];
                 arguments = text.Length > commandNameLength
                     ? text.Remove(0, commandNameLength).Split(ArgumentsSeparator)
                     : Array.Empty<string>();
@@ -63,6 +64,13 @@ namespace Finance.Bot.Business.Services.Implementation
 
             if (state.TryGetString(StateKeys.CommandAwaitingArguments, out command!))
             {
+                arguments = new[] { text };
+                return true;
+            }
+
+            if (TryParse(text, out double value) && !IsNaN(value) && !IsInfinity(value))
+            {
+                command = CommandNames.ReportOperation;
                 arguments = new[] { text };
                 return true;
             }

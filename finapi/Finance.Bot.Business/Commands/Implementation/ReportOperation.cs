@@ -39,47 +39,21 @@ namespace Finance.Bot.Business.Commands.Implementation
                 return;
             }
 
-            OperationCategoryModel? selectedCategory = await GetOperationCategory(selectedAccountId);
+            double? amount = await GetAmountAsync();
+            if (!amount.HasValue)
+            {
+                return;
+            }
+
+            OperationCategoryModel? selectedCategory = await GetOperationCategoryAsync(selectedAccountId);
             if (selectedCategory == null)
             {
-                State[StateKeys.CommandAwaitingArguments] = CommandNames.ReportOperation;
-                string messageText = "What kind of operation you would like to report?";
-
-                OperationCategoryModel[] operationCategories =
-                    await _operationCategoryService.GetCategoriesAsync(selectedAccountId);
-
-                KeyValuePair<string, string>[] categories = operationCategories
-                    .OrderBy(x=>x.IsIncome)
-                    .ThenBy(x=>x.Name)
-                    .Select(x => new KeyValuePair<string, string>(x.Name, x.Id.ToString()))
-                    .Append(new KeyValuePair<string, string>("New category",
-                        $"{CommandNames.CreateOperationCategory}"))
-                    .ToArray();
-
-                await _messageSender.SendAsync(new BotMessage(messageText, categories));
                 return;
             }
 
-
-            if (!ArgumentProvider.TryGetDouble(1, out double amount))
+            DateTime? operationDate = await GetOperationDateAsync(selectedCategory, amount.Value);
+            if (!operationDate.HasValue)
             {
-                State[StateKeys.CommandAwaitingArguments] = CommandNames.ReportOperation;
-                await _messageSender.SendAsync(new BotMessage("Please enter amount"));
-                return;
-            }
-
-            if (!ArgumentProvider.TryGetDateTime(2, out DateTime madeAt))
-            {
-                State[StateKeys.CommandAwaitingArguments] = CommandNames.ReportOperation;
-                string messageText = selectedCategory.IsIncome
-                    ? $"When did you get {amount} as {selectedCategory.Name}?"
-                    : $"When did you spend {amount} for {selectedCategory.Name}?";
-                var today = DateTime.UtcNow.Date;
-                await _messageSender.SendAsync(new BotMessage(messageText,
-                    today.ToString(DateFormat), today.AddDays(-1).ToString(DateFormat),
-                    today.AddDays(-2).ToString(DateFormat), today.AddDays(-3).ToString(DateFormat),
-                    today.AddDays(-4).ToString(DateFormat), today.AddDays(-5).ToString(DateFormat),
-                    today.AddDays(-6).ToString(DateFormat), today.AddDays(-7).ToString(DateFormat)));
                 return;
             }
 
@@ -87,29 +61,84 @@ namespace Finance.Bot.Business.Commands.Implementation
 
             try
             {
-                await _operationService.CreateOperation(userId, selectedAccountId, selectedCategory.Id, amount, madeAt);
+                await _operationService.CreateOperation(userId, selectedAccountId, selectedCategory.Id, amount.Value, operationDate.Value);
             }
             catch (Exception ex)
             {
                 throw new CommandExecutionException(ex, "Failed to report an operation.",
-                    $"{CommandNames.ReportOperation} {selectedCategory.Id},{amount},{madeAt:O}");
+                    $"{CommandNames.ReportOperation} {selectedCategory.Id},{amount},{operationDate.Value:O}");
             }
 
-            BotMessage message = new BotMessage(
-                $"Reported {(selectedCategory.IsIncome ? "gaining" : "spending")} of {amount} {(selectedCategory.IsIncome ? "as" : "for")} {selectedCategory.Name}.",
-                new KeyValuePair<string, string>(
-                    $"Report more {(selectedCategory.IsIncome ? "income" : "expenses")} to {selectedCategory.Name}",
-                    $"{CommandNames.ReportOperation} {selectedCategory.Id}")
-            );
+            string successMessageText = selectedCategory.IsIncome
+                ? $"Reported gaining of {amount} as {selectedCategory.Name} on {operationDate.Value.ToString(DateFormat)}."
+                : $"Reported spending of {amount} for {selectedCategory.Name} on {operationDate.Value.ToString(DateFormat)}.";
+
+            BotMessage message = new BotMessage(successMessageText);
 
             await _messageSender.SendAsync(message);
         }
 
-        private async Task<OperationCategoryModel?> GetOperationCategory(int accountId)
+        private async Task<double?> GetAmountAsync()
         {
-            return ArgumentProvider.TryGetInteger(0, out int categoryId)
+            if (ArgumentProvider.TryGetDouble(0, out double amount))
+            {
+                return amount;
+            }
+
+            State[StateKeys.CommandAwaitingArguments] = CommandNames.ReportOperation;
+            await _messageSender.SendAsync(new BotMessage("Please enter amount"));
+            return null;
+
+        }
+
+        private async Task<OperationCategoryModel?> GetOperationCategoryAsync(int selectedAccountId)
+        {
+            // get operation category
+            OperationCategoryModel? selectedCategory = ArgumentProvider.TryGetInteger(1, out int categoryId)
                 ? await _operationCategoryService.GetCategoryAsync(categoryId)
                 : null;
+            if (selectedCategory != null && selectedCategory.AccountId == selectedAccountId)
+            {
+                return selectedCategory;
+            }
+
+            State[StateKeys.CommandAwaitingArguments] = CommandNames.ReportOperation;
+            string messageText = "What kind of operation you would like to report?";
+            OperationCategoryModel[] operationCategories =
+                await _operationCategoryService.GetCategoriesAsync(selectedAccountId);
+
+            KeyValuePair<string, string>[] categories = operationCategories
+                .OrderBy(x => x.IsIncome)
+                .ThenBy(x => x.Name)
+                .Select(x => new KeyValuePair<string, string>(x.Name, x.Id.ToString()))
+                .Append(new KeyValuePair<string, string>("New category",
+                    $"{CommandNames.CreateOperationCategory}"))
+                .ToArray();
+
+            await _messageSender.SendAsync(new BotMessage(messageText, categories));
+
+            return null;
+        }
+
+        private async Task<DateTime?> GetOperationDateAsync(OperationCategoryModel operationCategory, double amount)
+        {
+            if (ArgumentProvider.TryGetDateTime(2, out DateTime madeOn))
+            {
+                return madeOn;
+            }
+
+            State[StateKeys.CommandAwaitingArguments] = CommandNames.ReportOperation;
+            string messageText = operationCategory.IsIncome
+                ? $"When did you get {amount} as {operationCategory.Name}?"
+                : $"When did you spend {amount} for {operationCategory.Name}?";
+            var today = DateTime.UtcNow.Date;
+            await _messageSender.SendAsync(new BotMessage(messageText,
+                today.ToString(DateFormat), today.AddDays(-1).ToString(DateFormat),
+                today.AddDays(-2).ToString(DateFormat), today.AddDays(-3).ToString(DateFormat),
+                today.AddDays(-4).ToString(DateFormat), today.AddDays(-5).ToString(DateFormat),
+                today.AddDays(-6).ToString(DateFormat), today.AddDays(-7).ToString(DateFormat)));
+
+            return null;
         }
     }
 }
