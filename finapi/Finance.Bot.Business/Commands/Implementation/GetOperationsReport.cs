@@ -36,7 +36,7 @@ namespace Finance.Bot.Business.Commands.Implementation
                 return;
             }
 
-            DateTime? to = await GetEndDateAsync();
+            DateTime? to = await GetEndDateAsync(from.Value);
             if (!to.HasValue)
             {
                 return;
@@ -100,9 +100,18 @@ namespace Finance.Bot.Business.Commands.Implementation
             return null;
         }
 
-        private async Task<DateTime?> GetEndDateAsync()
+        private async Task<DateTime?> GetEndDateAsync(DateTime startDate)
         {
-            if (ArgumentProvider.TryGetDateTime(1, out DateTime parsedValue))
+            string text;
+            if (!ArgumentProvider.TryGetDateTime(1, out DateTime parsedValue))
+            {
+                text = $"You want me to include operation from {startDate.ToString(DateFormat)} till when?";
+            }
+            else if (parsedValue < startDate)
+            {
+                text = $"The date must be later than {startDate.ToString(DateFormat)}.";
+            }
+            else
             {
                 return parsedValue.Date.AddDays(1).AddSeconds(-1);
             }
@@ -113,7 +122,7 @@ namespace Finance.Bot.Business.Commands.Implementation
             var firstDayOfNextMonth = new DateTime(now.Year, now.Month, 1).AddMonths(1);
 
             await _messageSender.SendAsync(new BotMessage(
-                "Till what date you want me to include operations?", 
+                text,
                 firstDayOfNextMonth.AddDays(-1).ToString(DateFormat), 
                 firstDayOfNextMonth.AddMonths(-1).AddDays(-1).ToString(DateFormat),
                 firstDayOfNextMonth.AddMonths(-2).AddDays(-1).ToString(DateFormat),
