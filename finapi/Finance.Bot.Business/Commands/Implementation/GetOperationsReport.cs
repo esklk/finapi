@@ -8,6 +8,8 @@ namespace Finance.Bot.Business.Commands.Implementation
 {
     public class GetOperationsReport : ArgumentedCommand
     {
+        private const string DateFormat = "MMMM d, yyyy";
+
         private readonly IOperationService _operationService;
         private readonly IBotMessageSender _messageSender;
 
@@ -28,44 +30,37 @@ namespace Finance.Bot.Business.Commands.Implementation
                 return;
             }
 
-            if(!ArgumentProvider.TryGetDateTime(0, out DateTime from))
+            DateTime? from = await GetStartDateAsync();
+            if (!from.HasValue)
             {
-                var now = DateTime.UtcNow;
-                var startOfCurrentMonth = new DateTime(now.Year, now.Month, 1);
-                State[StateKeys.CommandAwaitingArguments] = CommandNames.GetOperationsReport;
-                await _messageSender.SendAsync(new BotMessage(
-                    "Starting from what date you want the report to contain operations?",
-                    new KeyValuePair<string, string>("Start of current month",
-                        startOfCurrentMonth.ToString("yyyy-MM-dd")),
-                    new KeyValuePair<string, string>("Start of last month",
-                        startOfCurrentMonth.AddMonths(-1).ToString("yyyy-MM-dd"))));
                 return;
             }
 
-            if (!ArgumentProvider.TryGetDateTime(1, out DateTime to))
+            DateTime? to = await GetEndDateAsync();
+            if (!to.HasValue)
             {
-                State[StateKeys.CommandAwaitingArguments] = CommandNames.GetOperationsReport;
-                await _messageSender.SendAsync(new BotMessage(
-                    $"In the report you want to see operation from {from:MMM dd, yyyy} to what date?",
-                    new KeyValuePair<string, string>("Today", DateTime.UtcNow.ToString("yyyy-MM-dd"))));
                 return;
             }
 
             var operations = await _operationService
                 .GetOperationsAsync(accountId, q => q
-                .Where(o => o.CreatedOn >= from.Date && o.CreatedOn <= to.Date.AddDays(1).AddSeconds(-1))
-                .GroupBy(o => new { o.Category.Name, o.Category.IsIncome })
-                .Select(g => new
-                {
-                    Category = g.Key.Name,
-                    Total = g.Key.IsIncome? g.Sum(o => o.Ammount) : g.Sum(o => o.Ammount) * -1
-                })
-                .OrderByDescending(x => x.Total));
+                    .Where(o => o.CreatedOn >= from.Value && o.CreatedOn <= to.Value)
+                    .GroupBy(o => new { o.Category.Name, o.Category.IsIncome })
+                    .Select(g => new 
+                    { 
+                        Category = g.Key.Name, 
+                        Total = g.Key.IsIncome
+                            ? g.Sum(o => o.Ammount) 
+                            : g.Sum(o => o.Ammount) * -1
+                    })
+                    .OrderByDescending(x => x.Total)
+                );
 
             var messageTextBuilder = new StringBuilder()
                 .AppendFormat("Please see your operations report between {0:MMM dd, yyyy} and {1:MMM dd, yyyy}:", from, to)
                 .AppendLine()
                 .AppendFormat("Balance: {0}", operations.Sum(x => x.Total))
+                .AppendLine()
                 .AppendLine()
                 .AppendFormat("Total income: {0}", operations.Where(x => x.Total > 0).Sum(x => x.Total))
                 .AppendLine()
@@ -75,11 +70,58 @@ namespace Finance.Bot.Business.Commands.Implementation
             foreach (var operation in operations)
             {
                 messageTextBuilder
-                    .AppendFormat("{0}: {1}", operation.Category, operation.Total)
-                    .AppendLine();
+                    .AppendLine()
+                    .AppendFormat("{0}: {1}", operation.Category, operation.Total);
             }
 
             await _messageSender.SendAsync(new BotMessage(messageTextBuilder.ToString()));
+        }
+
+        private async Task<DateTime?> GetStartDateAsync()
+        {
+            if (ArgumentProvider.TryGetDateTime(0, out DateTime parsedValue))
+            {
+                return parsedValue.Date;
+            }
+
+            State[StateKeys.CommandAwaitingArguments] = CommandNames.GetOperationsReport;
+
+            var now = DateTime.UtcNow;
+            var firstDayOfCurrentMonth = new DateTime(now.Year, now.Month, 1);
+
+            await _messageSender.SendAsync(new BotMessage("Starting from what date you want me to include operations?", 
+                firstDayOfCurrentMonth.ToString(DateFormat), 
+                firstDayOfCurrentMonth.AddMonths(-1).ToString(DateFormat), 
+                firstDayOfCurrentMonth.AddMonths(-2).ToString(DateFormat),
+                firstDayOfCurrentMonth.AddMonths(-3).ToString(DateFormat),
+                firstDayOfCurrentMonth.AddMonths(-4).ToString(DateFormat),
+                firstDayOfCurrentMonth.AddMonths(-5).ToString(DateFormat)));
+            
+            return null;
+        }
+
+        private async Task<DateTime?> GetEndDateAsync()
+        {
+            if (ArgumentProvider.TryGetDateTime(1, out DateTime parsedValue))
+            {
+                return parsedValue.Date.AddDays(1).AddSeconds(-1);
+            }
+
+            State[StateKeys.CommandAwaitingArguments] = CommandNames.GetOperationsReport;
+
+            var now = DateTime.UtcNow;
+            var firstDayOfNextMonth = new DateTime(now.Year, now.Month, 1).AddMonths(1);
+
+            await _messageSender.SendAsync(new BotMessage(
+                "Till what date you want me to include operations?", 
+                firstDayOfNextMonth.AddDays(-1).ToString(DateFormat), 
+                firstDayOfNextMonth.AddMonths(-1).AddDays(-1).ToString(DateFormat),
+                firstDayOfNextMonth.AddMonths(-2).AddDays(-1).ToString(DateFormat),
+                firstDayOfNextMonth.AddMonths(-3).AddDays(-1).ToString(DateFormat),
+                firstDayOfNextMonth.AddMonths(-4).AddDays(-1).ToString(DateFormat),
+                firstDayOfNextMonth.AddMonths(-5).AddDays(-1).ToString(DateFormat)));
+            
+            return null;
         }
     }
 }
