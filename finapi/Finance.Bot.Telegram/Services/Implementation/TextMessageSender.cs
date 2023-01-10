@@ -5,27 +5,18 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Finance.Bot.Telegram.Services.Implementation
 {
-    public class TelegramBotMessageSender : IBotMessageSender
+    public class TextMessageSender : IBotMessageSender
     {
         private readonly ITelegramBotClient _botClient;
         private readonly long _chatId;
-        private readonly string? _queryId;
-
-        public TelegramBotMessageSender(ITelegramBotClient botClient, IUpdateProvider updateProvider)
+        public TextMessageSender(ITelegramBotClient botClient, IUpdateProvider updateProvider)
         {
             _botClient = botClient ?? throw new ArgumentNullException(nameof(botClient));
             _chatId = updateProvider.Update.GetChat().Id;
-            _queryId = updateProvider.Update.CallbackQuery?.Id;
         }
 
         public async Task SendAsync(BotMessage message)
         {
-            if (!string.IsNullOrWhiteSpace(_queryId))
-            {
-                // a workaround to remove a loader from callback button
-                await _botClient.AnswerCallbackQueryAsync(_queryId);
-            }
-
             await _botClient.SendTextMessageAsync(
                 chatId: _chatId,
                 text: message.Text,

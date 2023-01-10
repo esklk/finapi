@@ -83,7 +83,8 @@ namespace Finance.Bot.Telegram
                 .AddScoped<IFactory<IUpdateService, Update>, UpdateServiceFactory>()
                 .AddScoped<MessageUpdateService>()
                 .AddScoped<CallbackQueryUpdateService>()
-                .AddScoped<IBotMessageSender, TelegramBotMessageSender>();
+                .AddScoped<TextMessageSender>()
+                .AddScoped<IBotMessageSender>(BotMessageSenderFactory);
         }
 
         private static Start TelegramStartFactory(IServiceProvider serviceProvider)
@@ -104,6 +105,15 @@ namespace Finance.Bot.Telegram
             var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
 
             return new ErrorHandlingMessageProcessor(messageProcessor, messageSender, loggerFactory);
+        }
+
+        private static IBotMessageSender BotMessageSenderFactory(IServiceProvider serviceProvider)
+        {
+            var botClient = serviceProvider.GetRequiredService<ITelegramBotClient>();
+            var updateProvider = serviceProvider.GetRequiredService<IUpdateProvider>();
+            var messageSender = serviceProvider.GetRequiredService<TextMessageSender>();
+
+            return new CallbackQueryDeleteMessageSender(botClient, updateProvider, messageSender);
         }
     }
 }
