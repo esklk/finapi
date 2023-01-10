@@ -42,6 +42,8 @@ namespace Finance.Bot.Business.Commands.Implementation
                 return;
             }
 
+            State[StateKeys.CommandAwaitingArguments] = null;
+
             var operations = await _operationService
                 .GetOperationsAsync(accountId, q => q
                     .Where(o => o.CreatedOn >= from.Value && o.CreatedOn <= to.Value)
