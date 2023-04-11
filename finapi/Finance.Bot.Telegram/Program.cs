@@ -4,9 +4,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
 var host = new HostBuilder()
-    .ConfigureAppConfiguration(configurationBuilder => configurationBuilder.AddEnvironmentVariables("FINAPI_"))
+    .ConfigureAppConfiguration(configurationBuilder => configurationBuilder
+        .AddEnvironmentVariables("FINAPI_")
+        .AddJsonFile("local.settings.json", true))
     .ConfigureFunctionsWorkerDefaults(applicationBuilder => applicationBuilder.UseFunctionContextAccessor())
-    .ConfigureServices(Startup.Configure)
+    .ConfigureServices(Startup.ConfigureServices)
     .UseDefaultServiceProvider((_, options) =>
     {
         options.ValidateScopes = true;
