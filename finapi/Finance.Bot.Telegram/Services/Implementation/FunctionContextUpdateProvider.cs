@@ -31,7 +31,13 @@ namespace Finance.Bot.Telegram.Services.Implementation
                 throw new InvalidOperationException("Cannot retrieve HTTP request data.");
             }
 
-            var update = JsonConvert.DeserializeObject<Update>(requestData.ReadAsString());
+            string? updateString = await requestData.ReadAsStringAsync();
+            if (string.IsNullOrWhiteSpace(updateString))
+            {
+                throw new InvalidOperationException("Body is empty.");
+            }
+
+            var update = JsonConvert.DeserializeObject<Update>(updateString);
             if (update == null)
             {
                 throw new InvalidOperationException("Body does not represent a valid update.");

@@ -9,7 +9,7 @@ namespace Finance.Bot.Business.Mapping.Converters
         {
             return string.IsNullOrWhiteSpace(source)
                 ? new Dictionary<string, string>()
-                : JsonConvert.DeserializeObject<Dictionary<string, string>>(source);
+                : JsonConvert.DeserializeObject<Dictionary<string, string>>(source) ?? new Dictionary<string, string>();
         }
 
         public string Convert(Dictionary<string, string> source, string destination, ResolutionContext context)
