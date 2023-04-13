@@ -27,7 +27,8 @@ namespace Finance.Web.Api.Controllers
         public async Task<dynamic[]> Get(int accountId, ODataQueryOptions<OperationModel> query)
         {
             //TODO: move this to some service to keep controller thin
-            var result = await _operationService.QueryOperations(accountId, x => query.ApplyTo(x) as IQueryable<dynamic>);
+            var result =
+                await _operationService.GetOperationsAsync(accountId, x => query.ApplyTo(x) as IQueryable<dynamic>);
 
             if (query.SelectExpand != null)
             {

@@ -7,12 +7,12 @@ using System.Security.Claims;
 
 namespace Finance.Web.Api.Services.Implementation
 {
-    public class JwtAccessTokenGenerator : IAccessTokenGenerator
+    public class JwtTokenGenerator : ITokenGenerator
     {
-        private readonly IJwtConfiguration _jwtConfiguration;
+        private readonly JwtConfiguration _jwtConfiguration;
         private readonly SecurityTokenHandler _securityTokenHandler;
 
-        public JwtAccessTokenGenerator(IJwtConfiguration jwtConfiguration, SecurityTokenHandler securityTokenHandler)
+        public JwtTokenGenerator(JwtConfiguration jwtConfiguration, SecurityTokenHandler securityTokenHandler)
         {
             _jwtConfiguration = jwtConfiguration ?? throw new ArgumentNullException(nameof(jwtConfiguration));
             _securityTokenHandler = securityTokenHandler ?? throw new ArgumentNullException(nameof(securityTokenHandler));
@@ -20,7 +20,7 @@ namespace Finance.Web.Api.Services.Implementation
 
         public string Generate(IEnumerable<Claim> claims)
         {
-            var now = DateTime.UtcNow;
+            DateTime now = DateTime.UtcNow;
 
             var jwt = new JwtSecurityToken(
                     issuer: _jwtConfiguration.Issuer,

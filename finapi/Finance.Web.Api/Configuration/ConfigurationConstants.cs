@@ -4,5 +4,6 @@
     {
         public const string OAuthConfiguration = "OAuthConfiguration";
         public const string JwtConfiguration = "JwtConfiguration";
+        public const string TokenConfiguration = "TokenConfiguration";
     }
 }

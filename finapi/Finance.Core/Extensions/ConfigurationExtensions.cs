@@ -17,5 +17,16 @@ namespace Finance.Core.Extensions
 
             return value!;
         }
+        public static T GetRequired<T>(this IConfiguration configuration, string key)
+        {
+            T? defaultValue = default;
+            T? value = configuration.GetSection(key).Get<T>();
+            if (Comparer<T>.Default.Compare(value, defaultValue) == 0)
+            {
+                throw new MissingConfigurationException(key);
+            }
+
+            return value!;
+        }
     }
 }

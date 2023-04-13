@@ -1,9 +1,9 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-namespace Finance.Web.Api.Configuration.Implementation
+namespace Finance.Web.Api.Configuration
 {
-    public class JwtConfiguration : IJwtConfiguration
+    public class JwtConfiguration
     {
         public string Issuer { get; set; }
 

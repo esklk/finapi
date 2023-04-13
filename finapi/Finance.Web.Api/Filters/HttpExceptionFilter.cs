@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
 using System.Net;
+using Finance.Web.Api.Exceptions;
 
 namespace Finance.Web.Api.Filters
 {
@@ -11,15 +12,20 @@ namespace Finance.Web.Api.Filters
         {
             HttpStatusCode code;
             string message;
-            if (context.Exception is ArgumentException)
+            switch (context.Exception)
             {
-                code = HttpStatusCode.BadRequest;
-                message = context.Exception.Message;
-            }
-            else
-            {
-                code = HttpStatusCode.InternalServerError;
-                message = "Unexpected server error. Please try again later.";
+                case AuthenticationFailedException:
+                    code = HttpStatusCode.Unauthorized;
+                    message = context.Exception.Message;
+                    break;
+                case ArgumentException:
+                    code = HttpStatusCode.BadRequest;
+                    message = context.Exception.Message;
+                    break;
+                default:
+                    code = HttpStatusCode.InternalServerError;
+                    message = "Unexpected server error. Please try again later.";
+                    break;
             }
 
             context.Result = new ObjectResult(new { message }) { StatusCode = (int)code };

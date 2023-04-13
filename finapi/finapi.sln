@@ -15,7 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Finance.Bot.Data", "Finance
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Finance.Bot.Business.Tests", "Finance.Bot.Business.Tests\Finance.Bot.Business.Tests.csproj", "{FF7E2D2E-ABCF-4835-81A4-C564C53311E9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finance.Bot.Telegram", "Finance.Bot.Telegram\Finance.Bot.Telegram.csproj", "{699B36DF-4699-43E1-81A4-91A2A0F6409A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Finance.Bot.Telegram", "Finance.Bot.Telegram\Finance.Bot.Telegram.csproj", "{699B36DF-4699-43E1-81A4-91A2A0F6409A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Finance.Web.Api", "Finance.Web.Api\Finance.Web.Api.csproj", "{EF103205-1583-483D-8410-3C6B6614AB87}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{699B36DF-4699-43E1-81A4-91A2A0F6409A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{699B36DF-4699-43E1-81A4-91A2A0F6409A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{699B36DF-4699-43E1-81A4-91A2A0F6409A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF103205-1583-483D-8410-3C6B6614AB87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF103205-1583-483D-8410-3C6B6614AB87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF103205-1583-483D-8410-3C6B6614AB87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF103205-1583-483D-8410-3C6B6614AB87}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
