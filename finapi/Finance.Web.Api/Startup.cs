@@ -50,7 +50,6 @@ namespace Finance.Web.Api
                 });
 
             services.AddAuthorization();
-            //services.AddSingleton<IAuthorizationHandler, HttpAuthorizationHandler>();
 
             Data.Bootstrapper.ConfigureServices(Configuration, services);
             Business.Bootstrapper.ConfigureServices(Configuration, services);
@@ -60,7 +59,11 @@ namespace Finance.Web.Api
                 .AddScoped(UserAuthenticationServiceFactory)
                 .AddScoped<SecurityTokenHandler, JwtSecurityTokenHandler>(); ;
 
-            services.AddControllers(options => options.Filters.Add(typeof(ModelValidationActionFilter)));
+            services.AddControllers(options =>
+            {
+                options.Filters.Add(typeof(ModelValidationActionFilter));
+                options.Filters.Add(typeof(HttpExceptionFilter));
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
