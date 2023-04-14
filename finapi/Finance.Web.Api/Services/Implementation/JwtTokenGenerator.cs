@@ -10,12 +10,10 @@ namespace Finance.Web.Api.Services.Implementation
     public class JwtTokenGenerator : ITokenGenerator
     {
         private readonly JwtConfiguration _jwtConfiguration;
-        private readonly SecurityTokenHandler _securityTokenHandler;
 
-        public JwtTokenGenerator(JwtConfiguration jwtConfiguration, SecurityTokenHandler securityTokenHandler)
+        public JwtTokenGenerator(JwtConfiguration jwtConfiguration)
         {
             _jwtConfiguration = jwtConfiguration ?? throw new ArgumentNullException(nameof(jwtConfiguration));
-            _securityTokenHandler = securityTokenHandler ?? throw new ArgumentNullException(nameof(securityTokenHandler));
         }
 
         public string Generate(IEnumerable<Claim> claims)
@@ -29,7 +27,7 @@ namespace Finance.Web.Api.Services.Implementation
                     expires: now.Add(TimeSpan.FromMinutes(_jwtConfiguration.LifetimeMinutes)),
                     signingCredentials: new SigningCredentials(_jwtConfiguration.SecurityKey, _jwtConfiguration.SecurityAlgorithm));
 
-            string encodedJwt = _securityTokenHandler.WriteToken(jwt);
+            string encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
             return encodedJwt;
         }

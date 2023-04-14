@@ -11,7 +11,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
 using Finance.Core.Extensions;
 using Finance.Web.Api.Models;
 using ConfigurationConstants = Finance.Web.Api.Configuration.ConfigurationConstants;
@@ -38,15 +37,7 @@ namespace Finance.Web.Api
                 .AddJwtBearer(x =>
                 {
                     x.RequireHttpsMetadata = true;
-                    x.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateLifetime = true,
-                        ValidateIssuer = true,
-                        ValidateAudience = false,
-                        ValidIssuer = tokenConfiguration.Access.Issuer,
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = tokenConfiguration.Access.SecurityKey
-                    };
+                    x.TokenValidationParameters = BuildJwtValidationParameters(tokenConfiguration.Access);
                 });
 
             services.AddAuthorization();
@@ -56,8 +47,8 @@ namespace Finance.Web.Api
 
             services
                 .AddScoped<IAuthenticationService<GoogleAuthenticationData>, GoogleAuthenticationService>()
-                .AddScoped(UserAuthenticationServiceFactory)
-                .AddScoped<SecurityTokenHandler, JwtSecurityTokenHandler>(); ;
+                .AddScoped<IAuthenticationService<UserAuthenticationData>>(UserAuthenticationServiceFactory)
+                .AddScoped<IAuthenticationService<AuthModel>>(RefreshAuthenticationServiceFactory);
 
             services.AddControllers(options =>
             {
@@ -85,19 +76,40 @@ namespace Finance.Web.Api
                 .UseStaticFiles();
         }
 
-        private static IAuthenticationService<UserAuthenticationData> UserAuthenticationServiceFactory(IServiceProvider services)
+        private static TokenValidationParameters BuildJwtValidationParameters(JwtConfiguration configuration)
+        {
+            return new TokenValidationParameters
+            {
+                ValidateLifetime = true,
+                ValidateIssuer = true,
+                ValidIssuer = configuration.Issuer,
+                ValidateAudience = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = configuration.SecurityKey
+            };
+        }
+
+        private static UserAuthenticationService UserAuthenticationServiceFactory(IServiceProvider services)
         {
             var tokenConfiguration = services.GetRequiredService<TokenConfiguration>();
-            var securityTokenHandler = services.GetRequiredService<SecurityTokenHandler>();
-
-            var accessTokenGenerator = new JwtTokenGenerator(tokenConfiguration.Access, securityTokenHandler);
-            var refreshTokenGenerator = new JwtTokenGenerator(tokenConfiguration.Refresh, securityTokenHandler);
+            var accessTokenGenerator = new JwtTokenGenerator(tokenConfiguration.Access);
+            var refreshTokenGenerator = new JwtTokenGenerator(tokenConfiguration.Refresh);
 
             var userLoginService = services.GetRequiredService<IUserLoginService>();
             var userService = services.GetRequiredService<IUserService>();
 
             return new UserAuthenticationService(userLoginService, userService, accessTokenGenerator,
                 refreshTokenGenerator);
+        }
+
+        private static RefreshAuthenticationService RefreshAuthenticationServiceFactory(IServiceProvider services)
+        {
+            var tokenConfiguration = services.GetRequiredService<TokenConfiguration>();
+            var accessTokenGenerator = new JwtTokenGenerator(tokenConfiguration.Access);
+            var accessTokenValidator = new JwtTokenValidator(BuildJwtValidationParameters(tokenConfiguration.Access));
+            var refreshTokenValidator = new JwtTokenValidator(BuildJwtValidationParameters(tokenConfiguration.Refresh));
+
+            return new RefreshAuthenticationService(accessTokenGenerator, accessTokenValidator, refreshTokenValidator);
         }
     }
 }

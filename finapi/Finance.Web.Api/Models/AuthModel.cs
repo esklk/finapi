@@ -1,6 +1,6 @@
 ﻿namespace Finance.Web.Api.Models
 {
-    public class AuthModel
+    public record AuthModel
     {
         public string AccessToken { get; set; }
 
